@@ -1,0 +1,721 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+
+interface Props {
+
+  open:boolean;
+
+  onClose:()=>void;
+
+  onSave:(order:any)=>void;
+
+}
+
+
+
+type OrderProduct = {
+
+  name:string;
+
+  quantity:number;
+
+};
+
+
+
+
+
+export default function SaleModal({
+
+  open,
+
+  onClose,
+
+  onSave
+
+}:Props){
+
+
+
+  const [client,setClient] = useState("");
+
+  const [selectedClient,setSelectedClient] = useState<any>(null);
+
+  const [clients,setClients] = useState<any[]>([]);
+
+  const [searchClient,setSearchClient] = useState("");
+
+  const [showClients,setShowClients] = useState(false);
+
+
+
+  const [products,setProducts] = useState<OrderProduct[]>([]);
+
+  const [productName,setProductName] = useState("");
+
+  const [quantity,setQuantity] = useState(1);
+
+  const [total,setTotal] = useState(0);
+
+  const [advance,setAdvance] = useState(0);
+
+  const [payment,setPayment] = useState("TRANSFERENCIA");
+
+  const [status,setStatus] = useState("PENDIENTE");
+
+
+
+
+
+  useEffect(()=>{
+
+
+    const data = localStorage.getItem("clients");
+
+
+    if(data){
+
+      setClients(JSON.parse(data));
+
+    }
+
+
+  },[open]);
+
+
+
+
+
+
+
+  const balance = total - advance;
+
+
+
+
+
+
+
+
+  function addProduct(){
+
+
+    if(!productName.trim()) return;
+
+
+
+    setProducts((prev)=>[
+
+      ...prev,
+
+      {
+
+        name:productName,
+
+        quantity
+
+      }
+
+    ]);
+
+
+
+    setProductName("");
+
+    setQuantity(1);
+
+
+  }
+
+
+
+
+
+
+
+  function removeProduct(index:number){
+
+
+    setProducts((prev)=>
+
+      prev.filter((_,i)=>i!==index)
+
+    );
+
+
+  }
+
+
+
+
+
+
+
+
+  function saveOrder(){
+
+
+
+    const order = {
+
+
+      client,
+
+      clientId:selectedClient?.id || null,
+
+      clientPhone:selectedClient?.phone || "",
+
+      clientEmail:selectedClient?.email || "",
+
+      products,
+
+      total,
+
+      advance,
+
+      balance,
+
+      payment,
+
+      status,
+
+      createdAt:new Date().toISOString()
+
+
+    };
+
+
+
+    onSave(order);
+
+
+
+
+    setClient("");
+
+    setSelectedClient(null);
+
+    setSearchClient("");
+
+    setProducts([]);
+
+    setProductName("");
+
+    setQuantity(1);
+
+    setTotal(0);
+
+    setAdvance(0);
+
+    setPayment("TRANSFERENCIA");
+
+    setStatus("PENDIENTE");
+
+
+
+    onClose();
+
+
+  }
+
+
+
+
+
+
+
+
+  if(!open) return null;
+
+
+
+
+
+
+
+  const filteredClients = clients.filter((item)=>
+
+
+    item.name
+
+    .toLowerCase()
+
+    .includes(
+
+      searchClient.toLowerCase()
+
+    )
+
+
+  );
+
+
+
+
+
+
+
+
+
+  return (
+
+
+    <div className="
+    fixed
+    inset-0
+    bg-black/40
+    flex
+    items-center
+    justify-center
+    z-50
+    ">
+
+
+      <div className="
+      bg-white
+      rounded-3xl
+      p-8
+      w-[650px]
+      space-y-5
+      max-h-[90vh]
+      overflow-y-auto
+      ">
+
+
+
+
+
+        <h2 className="text-2xl font-bold">
+
+          Nuevo pedido
+
+        </h2>
+
+
+
+
+
+
+
+        <div className="relative">
+
+
+          <input
+
+            className="w-full border rounded-xl p-3"
+
+            placeholder="Buscar cliente..."
+
+            value={client}
+
+            onFocus={()=>setShowClients(true)}
+
+            onChange={(e)=>{
+
+              setClient(e.target.value);
+
+              setSearchClient(e.target.value);
+
+              setSelectedClient(null);
+
+            }}
+
+          />
+
+
+
+          {showClients && filteredClients.length > 0 && (
+
+
+            <div className="
+            absolute
+            top-14
+            left-0
+            right-0
+            bg-white
+            border
+            rounded-xl
+            shadow-lg
+            z-20
+            max-h-48
+            overflow-y-auto
+            ">
+
+
+              {filteredClients.map((item:any)=>(
+
+
+                <button
+
+                  key={item.id || item.name}
+
+                  onClick={()=>{
+
+
+                    setClient(item.name);
+
+                    setSelectedClient(item);
+
+                    setSearchClient("");
+
+                    setShowClients(false);
+
+
+                  }}
+
+
+                  className="
+                  w-full
+                  text-left
+                  px-4
+                  py-3
+                  hover:bg-stone-100
+                  "
+
+                >
+
+                  <div className="font-semibold">
+
+                    {item.name}
+
+                  </div>
+
+
+                  {item.phone && (
+
+                    <div className="text-xs text-stone-500">
+
+                      📱 {item.phone}
+
+                    </div>
+
+                  )}
+
+
+                </button>
+
+
+              ))}
+
+
+
+            </div>
+
+
+          )}
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div className="border rounded-xl p-4 space-y-3">
+
+
+          <h3 className="font-bold">
+
+            Productos
+
+          </h3>
+
+
+
+
+          <div className="grid grid-cols-3 gap-3">
+
+
+            <input
+
+              className="border rounded-xl p-3 col-span-2"
+
+              placeholder="Producto"
+
+              value={productName}
+
+              onChange={(e)=>setProductName(e.target.value)}
+
+            />
+
+
+
+            <input
+
+              type="number"
+
+              className="border rounded-xl p-3"
+
+              value={quantity}
+
+              onChange={(e)=>setQuantity(Number(e.target.value))}
+
+            />
+
+
+          </div>
+
+
+
+
+
+          <button
+
+            onClick={addProduct}
+
+            className="border rounded-xl px-4 py-2"
+
+          >
+
+            Agregar producto
+
+          </button>
+
+
+
+
+
+          {products.map((p,index)=>(
+
+
+            <div
+
+              key={index}
+
+              className="flex justify-between bg-stone-50 p-3 rounded-xl"
+
+            >
+
+              <span>
+
+                {p.name} x {p.quantity}
+
+              </span>
+
+
+              <button
+
+                onClick={()=>removeProduct(index)}
+
+                className="text-red-600"
+
+              >
+
+                Quitar
+
+              </button>
+
+
+            </div>
+
+
+          ))}
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div className="grid grid-cols-2 gap-4">
+
+
+          <input
+
+            type="number"
+
+            className="border rounded-xl p-3"
+
+            placeholder="Total"
+
+            value={total}
+
+            onChange={(e)=>setTotal(Number(e.target.value))}
+
+          />
+
+
+
+          <input
+
+            type="number"
+
+            className="border rounded-xl p-3"
+
+            placeholder="Anticipo"
+
+            value={advance}
+
+            onChange={(e)=>setAdvance(Number(e.target.value))}
+
+          />
+
+
+        </div>
+
+
+
+
+
+
+        <div className="bg-stone-100 rounded-xl p-4">
+
+          Saldo pendiente:
+
+          <strong className="block text-xl">
+
+            ${balance.toLocaleString("es-AR")}
+
+          </strong>
+
+        </div>
+
+
+
+
+
+
+
+        <select
+
+          className="w-full border rounded-xl p-3"
+
+          value={payment}
+
+          onChange={(e)=>setPayment(e.target.value)}
+
+        >
+
+          <option value="TRANSFERENCIA">
+
+            TRANSFERENCIA
+
+          </option>
+
+          <option value="EFECTIVO">
+
+            EFECTIVO
+
+          </option>
+
+
+        </select>
+
+
+
+
+
+
+
+
+        <select
+
+          className="w-full border rounded-xl p-3"
+
+          value={status}
+
+          onChange={(e)=>setStatus(e.target.value)}
+
+        >
+
+          <option value="PENDIENTE">
+
+            PENDIENTE
+
+          </option>
+
+
+          <option value="PRODUCCION">
+
+            PRODUCCION
+
+          </option>
+
+
+          <option value="LISTO">
+
+            LISTO
+
+          </option>
+
+
+          <option value="ENTREGADO">
+
+            ENTREGADO
+
+          </option>
+
+
+        </select>
+
+
+
+
+
+
+
+
+        <div className="flex justify-end gap-3">
+
+
+          <button
+
+            onClick={onClose}
+
+            className="border px-5 py-2 rounded-xl"
+
+          >
+
+            Cancelar
+
+          </button>
+
+
+
+
+          <button
+
+            onClick={saveOrder}
+
+            className="
+            bg-stone-900
+            text-white
+            px-5
+            py-2
+            rounded-xl
+            "
+
+          >
+
+            Guardar pedido
+
+          </button>
+
+
+
+        </div>
+
+
+
+
+
+
+      </div>
+
+
+    </div>
+
+
+  );
+
+
+}

@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Product {
+  id            String          @id @default(cuid())
+  name          String
+  sku           String          @unique
+  description   String?
+  image         String?
+  cost          Decimal
+  price         Decimal
+  stock         Int             @default(0)
+  minimumStock  Int             @default(0)
+  active        Boolean         @default(true)
+  categoryId    String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  type          String          @default("PRODUCTO_TERMINADO")
+  category      Category        @relation(fields: [categoryId], references: [id])
+  Production    Production[]
+  purchaseItems PurchaseItem[]
+  Recipe        Recipe[]
+  RecipeItem    RecipeItem[]
+  movements     StockMovement[]
+  SaleItem      SaleItem[]
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  color       String?
+  icon        String?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+}
+
+model StockMovement {
+  id        String   @id @default(cuid())
+  type      String
+  quantity  Int
+  note      String?
+  productId String
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+model Supplier {
+  id        String     @id @default(cuid())
+  name      String
+  company   String?
+  phone     String?
+  email     String?
+  notes     String?
+  active    Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  purchases Purchase[]
+}
+
+model Purchase {
+  id           String         @id @default(cuid())
+  supplierId   String
+  status       String         @default("PENDIENTE")
+  total        Decimal        @default(0)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  purchaseType String         @default("MATERIA_PRIMA")
+  supplier     Supplier       @relation(fields: [supplierId], references: [id])
+  items        PurchaseItem[]
+}
+
+model PurchaseItem {
+  id         String   @id @default(cuid())
+  purchaseId String
+  productId  String
+  quantity   Int
+  cost       Decimal
+  product    Product  @relation(fields: [productId], references: [id])
+  purchase   Purchase @relation(fields: [purchaseId], references: [id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Production {
+  id        String   @id
+  productId String
+  quantity  Int
+  createdAt DateTime @default(now())
+  Product   Product  @relation(fields: [productId], references: [id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Recipe {
+  id         String       @id
+  productId  String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime
+  Product    Product      @relation(fields: [productId], references: [id])
+  RecipeItem RecipeItem[]
+}
+
+model Customer {
+  id    String  @id @default(cuid())
+  name  String
+  phone String?
+  email String?
+  notes String?
+
+  sales Sale[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Sale {
+  id String @id @default(cuid())
+
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  status      String  @default("PENDIENTE")
+  total       Decimal @default(0)
+  advance     Decimal @default(0)
+  balance     Decimal @default(0)
+  paymentType String?
+
+  dateIn  DateTime  @default(now())
+  dateOut DateTime?
+
+  items SaleItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SaleItem {
+  id String @id @default(cuid())
+
+  saleId String
+  sale   Sale   @relation(fields: [saleId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity Int
+  price    Decimal
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model RecipeItem {
+  id        String  @id
+  recipeId  String
+  productId String
+  quantity  Decimal
+  Product   Product @relation(fields: [productId], references: [id])
+  Recipe    Recipe  @relation(fields: [recipeId], references: [id])
+}
