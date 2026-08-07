@@ -10,166 +10,202 @@ export default function Login(){
 
   const [user,setUser] = useState("");
   const [password,setPassword] = useState("");
+  const [error,setError] = useState("");
+  const [loading,setLoading] = useState(false);
 
 
+  async function handleLogin(){
 
-  function handleLogin(){
+    console.log("LOGIN CLICK");
 
-    if(user === "admin" && password === "1234"){
-
-  localStorage.setItem(
-    "auth",
-    "true"
-  );
-
-  localStorage.setItem(
-    "user",
-    JSON.stringify({
-      name:"Silvia",
-      role:"Administrador"
-    })
-  );
+    setLoading(true);
+    setError("");
 
 
-  router.push("/private");
+    try {
 
-}
+      const res = await fetch("/api/login",{
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+          email:user,
+          password:password
+        })
+
+      });
+
+
+      const data = await res.json();
+
+      console.log(data);
+
+
+      if(!res.ok){
+
+        setError(data.error || "Error");
+
+        setLoading(false);
+
+        return;
+      }
+
+
+      localStorage.setItem(
+        "auth",
+        "true"
+      );
+
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(data.user)
+      );
+
+
+      router.push("/private");
+
+
+    } catch(e){
+
+      setError("Error de conexión");
+
+    }
+
+
+    setLoading(false);
 
   }
 
 
 
-  return (
+return (
 
-    <main className="
-    min-h-screen
-    bg-[#F8F8F6]
-    flex
-    items-center
-    justify-center
-    ">
-
-
-      <div className="
-      bg-white
-      border
-      border-stone-200
-      rounded-3xl
-      p-10
-      w-[420px]
-      shadow-sm
-      ">
+<main className="
+min-h-screen
+bg-[#F8F8F6]
+flex
+items-center
+justify-center
+">
 
 
-        <h1 className="
-        text-4xl
-        font-bold
-        text-center
-        ">
-
-          Aurelia
-
-        </h1>
-
+<div className="
+bg-white
+border
+border-stone-200
+rounded-3xl
+p-10
+w-[420px]
+">
 
 
-        <p className="
-        text-center
-        text-stone-500
-        mt-2
-        mb-8
-        ">
+<h1 className="
+text-4xl
+font-bold
+text-center
+">
+Aurelia
+</h1>
 
-          Sistema de gestión
 
-        </p>
+<p className="
+text-center
+text-stone-500
+mt-2
+mb-8
+">
+Sistema de gestión
+</p>
 
 
 
+<input
 
-        <input
+className="
+w-full
+border
+rounded-xl
+p-3
+mb-4
+"
 
-        className="
-        w-full
-        border
-        rounded-xl
-        p-3
-        mb-4
-        outline-none
-        focus:ring-2
-        "
+placeholder="Email"
 
-        placeholder="Usuario"
+value={user}
 
-        value={user}
+onChange={(e)=>setUser(e.target.value)}
 
-        onChange={
-          e=>setUser(e.target.value)
-        }
-
-        />
+/>
 
 
 
+<input
 
+className="
+w-full
+border
+rounded-xl
+p-3
+mb-4
+"
 
-        <input
+placeholder="Contraseña"
 
-        className="
-        w-full
-        border
-        rounded-xl
-        p-3
-        mb-6
-        outline-none
-        focus:ring-2
-        "
+type="password"
 
-        placeholder="Contraseña"
+value={password}
 
-        type="password"
+onChange={(e)=>setPassword(e.target.value)}
 
-        value={password}
-
-        onChange={
-          e=>setPassword(e.target.value)
-        }
-
-        />
+/>
 
 
 
+{error && (
 
+<p className="text-red-600 mb-4">
 
-        <button
+{error}
 
-        onClick={handleLogin}
+</p>
 
-        className="
-        w-full
-        bg-[#B89B72]
-        text-white
-        rounded-xl
-        p-3
-        font-semibold
-        hover:opacity-90
-        transition
-        "
-
-        >
-
-          Ingresar
-
-        </button>
+)}
 
 
 
+<button
 
-      </div>
+onClick={handleLogin}
+
+disabled={loading}
+
+className="
+w-full
+bg-[#B89B72]
+text-white
+rounded-xl
+p-3
+font-semibold
+"
+
+>
+
+{loading ? "Ingresando..." : "Ingresar"}
+
+</button>
 
 
-    </main>
 
-  );
+</div>
+
+
+</main>
+
+);
 
 }
