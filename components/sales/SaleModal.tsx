@@ -74,6 +74,8 @@ const [selectedProduct,setSelectedProduct] = useState<any>(null);
 
   const [total,setTotal] = useState(0);
 
+  const [descuento,setDescuento] = useState(0);
+
   const [advance,setAdvance] = useState(0);
 
   const [payment,setPayment] = useState("TRANSFERENCIA");
@@ -148,7 +150,14 @@ useEffect(()=>{
 
 
 
-  const balance = total - advance;
+  const descuentoMonto = total * (Number(descuento) || 0) / 100;
+  const totalFinal = Math.max(0, total - descuentoMonto);
+
+  // Si no hay anticipo, la venta queda pagada (saldo 0).
+  // Si hay anticipo, el saldo es lo que resta.
+  const pagado = (Number(advance) || 0) <= 0;
+  const effectiveAdvance = pagado ? totalFinal : Number(advance);
+  const balance = pagado ? 0 : Math.max(0, totalFinal - Number(advance));
 
 
 
@@ -299,9 +308,9 @@ useEffect(()=>{
 
       products,
 
-      total,
+      total:totalFinal,
 
-      advance,
+      advance:effectiveAdvance,
 
       balance,
 
@@ -334,6 +343,8 @@ useEffect(()=>{
     setQuantity(1);
 
     setTotal(0);
+
+    setDescuento(0);
 
     setAdvance(0);
 
@@ -765,7 +776,7 @@ useEffect(()=>{
   <div>
 
     <label className="text-sm text-stone-500 block mb-1">
-      Anticipo recibido
+      Descuento %
     </label>
 
     <input
@@ -774,9 +785,9 @@ useEffect(()=>{
 
       className="border rounded-xl p-3 w-full"
 
-      value={advance}
+      value={descuento}
 
-      onChange={(e)=>setAdvance(Number(e.target.value))}
+      onChange={(e)=>setDescuento(Number(e.target.value))}
 
     />
 
@@ -787,18 +798,57 @@ useEffect(()=>{
 
 
 
+        <div>
+
+          <label className="text-sm text-stone-500 block mb-1">
+            Anticipo recibido
+          </label>
+
+          <input
+            type="number"
+            className="border rounded-xl p-3 w-full"
+            value={advance}
+            onChange={(e)=>setAdvance(Number(e.target.value))}
+            placeholder="Dejá 0 si ya está pagado"
+          />
+
+          <p className="text-xs text-stone-400 mt-1">
+            Si lo dejás en 0, la venta queda <strong>pagada</strong>. Si ponés un monto, se calcula el saldo que resta.
+          </p>
+
+        </div>
 
 
 
-        <div className="bg-stone-100 rounded-xl p-4">
 
-          Saldo pendiente:
 
-          <strong className="block text-xl">
 
-            ${balance.toLocaleString("es-AR")}
+        <div className="bg-stone-100 rounded-xl p-4 space-y-1">
 
-          </strong>
+          {descuento > 0 && (
+            <div className="flex justify-between text-sm text-stone-500">
+              <span>Descuento ({descuento}%)</span>
+              <span>-${descuentoMonto.toLocaleString("es-AR")}</span>
+            </div>
+          )}
+
+          <div className="flex justify-between">
+            <span className="text-stone-600">Total a cobrar</span>
+            <strong>${totalFinal.toLocaleString("es-AR")}</strong>
+          </div>
+
+          <div className="flex justify-between items-center pt-1 mt-1 border-t border-stone-200">
+            <span className="text-stone-600">
+              {pagado ? "Estado del pago" : "Saldo pendiente"}
+            </span>
+            {pagado ? (
+              <strong className="text-emerald-700">PAGADO ✓</strong>
+            ) : (
+              <strong className="text-red-600 text-lg">
+                ${balance.toLocaleString("es-AR")}
+              </strong>
+            )}
+          </div>
 
         </div>
 
