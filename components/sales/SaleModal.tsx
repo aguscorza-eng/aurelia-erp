@@ -858,77 +858,60 @@ useEffect(()=>{
 
 
 
-        <select
-
-          className="w-full border rounded-xl p-3"
-
-          value={payment}
-
-          onChange={(e)=>setPayment(e.target.value)}
-
-        >
-
-          <option value="TRANSFERENCIA">
-
-            TRANSFERENCIA
-
-          </option>
-
-          <option value="EFECTIVO">
-
-            EFECTIVO
-
-          </option>
-
-
-        </select>
-
-
-
+        {/* MÉTODO DE PAGO — botones visibles */}
+        <div>
+          <p className="text-xs font-medium text-stone-500 mb-2">
+            Método de pago
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { value:"TRANSFERENCIA", label:"Transferencia" },
+              { value:"EFECTIVO", label:"Efectivo" }
+            ].map((opt)=>(
+              <button
+                key={opt.value}
+                type="button"
+                onClick={()=>setPayment(opt.value)}
+                className={`py-3 rounded-xl border font-semibold transition ${
+                  payment === opt.value
+                    ? "bg-stone-900 text-white border-stone-900"
+                    : "bg-white text-stone-600 border-stone-300 hover:bg-stone-50"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
 
-
-
-
-        <select
-
-          className="w-full border rounded-xl p-3"
-
-          value={status}
-
-          onChange={(e)=>setStatus(e.target.value)}
-
-        >
-
-          <option value="PENDIENTE">
-
-            PENDIENTE
-
-          </option>
-
-
-          <option value="PRODUCCION">
-
-            PRODUCCION
-
-          </option>
-
-
-          <option value="LISTO">
-
-            LISTO
-
-          </option>
-
-
-          <option value="ENTREGADO">
-
-            ENTREGADO
-
-          </option>
-
-
-        </select>
+        {/* ESTADO DEL PEDIDO — botones visibles */}
+        <div>
+          <p className="text-xs font-medium text-stone-500 mb-2">
+            Estado del pedido
+          </p>
+          <div className="grid grid-cols-4 gap-2">
+            {[
+              { value:"PENDIENTE",  label:"Pendiente",  on:"bg-yellow-500 text-white border-yellow-500" },
+              { value:"PRODUCCION", label:"Producción",  on:"bg-blue-600 text-white border-blue-600" },
+              { value:"LISTO",      label:"Listo",       on:"bg-green-600 text-white border-green-600" },
+              { value:"ENTREGADO",  label:"Entregado",   on:"bg-stone-700 text-white border-stone-700" }
+            ].map((opt)=>(
+              <button
+                key={opt.value}
+                type="button"
+                onClick={()=>setStatus(opt.value)}
+                className={`py-2.5 rounded-xl border text-sm font-semibold transition ${
+                  status === opt.value
+                    ? opt.on
+                    : "bg-white text-stone-600 border-stone-300 hover:bg-stone-50"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
 
 
