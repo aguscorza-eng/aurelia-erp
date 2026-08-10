@@ -202,6 +202,7 @@ export default function Home(){
                 value={money(totalSales)}
                 icon={<TrendingUp size={19}/>}
                 change={salesChange}
+                accent="green"
               />
 
 
@@ -209,6 +210,7 @@ export default function Home(){
                 title="Saldo pendiente"
                 value={money(pendingBalance)}
                 icon={<Receipt size={19}/>}
+                accent="amber"
               />
 
 
@@ -216,6 +218,7 @@ export default function Home(){
                 title="Productos vendidos"
                 value={unitsSold}
                 icon={<Box size={19}/>}
+                accent="blue"
               />
 
 
@@ -223,6 +226,7 @@ export default function Home(){
                 title="Stock crítico"
                 value={criticalStock}
                 icon={<Clock size={19}/>}
+                accent="red"
               />
 
 
@@ -380,22 +384,35 @@ return (
 
 
 
+const CARD_ACCENTS:Record<string,{ card:string; circle:string }> = {
+ green:   { card:"bg-emerald-50 border-emerald-100", circle:"bg-emerald-100 text-emerald-700" },
+ amber:   { card:"bg-amber-50 border-amber-100",     circle:"bg-amber-100 text-amber-700" },
+ blue:    { card:"bg-blue-50 border-blue-100",       circle:"bg-blue-100 text-blue-700" },
+ red:     { card:"bg-red-50 border-red-100",         circle:"bg-red-100 text-red-700" },
+ neutral: { card:"bg-white border-stone-100",        circle:"bg-[#F8F2E9] text-[#B08D57]" }
+};
+
+
 function Card({
  title,
  value,
  icon,
- change
+ change,
+ accent = "neutral"
 }:{
  title:string;
  value:any;
  icon:any;
  change?:number | null;
+ accent?:string;
 }){
+
+ const a = CARD_ACCENTS[accent] || CARD_ACCENTS.neutral;
 
 
 return (
 
-<div className="bg-white rounded-3xl p-5 border border-stone-100 flex justify-between items-center">
+<div className={`rounded-3xl p-5 border flex justify-between items-center ${a.card}`}>
 
 
 <div>
@@ -420,7 +437,7 @@ return (
 </div>
 
 
-<div className="bg-[#F8F2E9] rounded-full p-3">
+<div className={`rounded-full p-3 ${a.circle}`}>
 {icon}
 </div>
 
