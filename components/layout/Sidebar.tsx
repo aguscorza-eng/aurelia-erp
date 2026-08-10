@@ -167,29 +167,11 @@ flex-col
 
 <div className="px-8 py-8">
 
-
-<h1 className="
-text-4xl
-font-light
-tracking-tight
-">
-
-Aurelia
-
-</h1>
-
-
-
-<p className="
-text-sm
-text-stone-500
-mt-1
-">
-
-Business Manager
-
-</p>
-
+<img
+src="/logo-aurelia.png"
+alt="Aurelia"
+className="w-40 max-w-full h-auto"
+/>
 
 </div>
 
