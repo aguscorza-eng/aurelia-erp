@@ -433,6 +433,49 @@ export default function SalesPage(){
 
 
 
+  async function confirmPayment(sale:any){
+
+    const ok = window.confirm(
+      `¿Confirmar el pago del saldo pendiente de $${(sale.balance || 0).toLocaleString("es-AR")}?`
+    );
+
+    if(!ok) return;
+
+    try{
+
+      const res = await fetch(`/api/sales/${sale.id}`,{
+        method:"PATCH",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify({
+          advance: sale.total,
+          balance: 0
+        })
+      });
+
+      const data = await res.json();
+
+      if(!res.ok){
+        console.error(data.error);
+        alert("Error al confirmar el pago");
+        return;
+      }
+
+      setSales((prev)=>
+        prev.map((item)=>
+          item.id === sale.id ? data.data : item
+        )
+      );
+
+    }catch(error){
+      console.error(error);
+      alert("Error de conexión");
+    }
+
+  }
+
+
+
+
   return (
 
 
@@ -699,6 +742,8 @@ export default function SalesPage(){
             onReceipt={(sale)=>setReceiptSale(sale)}
 
             onStatusChange={updateStatus}
+
+            onConfirmPayment={confirmPayment}
 
           />
 

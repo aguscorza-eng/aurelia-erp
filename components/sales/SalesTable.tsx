@@ -8,6 +8,7 @@ import {
   Trash2,
   ArrowRight,
   ChevronDown,
+  DollarSign,
 } from "lucide-react";
 
 
@@ -18,6 +19,7 @@ interface Props {
   onDelete:(id:string)=>void;
   onReceipt:(sale:any)=>void;
   onStatusChange:(sale:any,status:string)=>void;
+  onConfirmPayment:(sale:any)=>void;
 }
 
 
@@ -27,7 +29,8 @@ export default function SalesTable({
   onEdit,
   onDelete,
   onReceipt,
-  onStatusChange
+  onStatusChange,
+  onConfirmPayment
 }:Props){
 
 
@@ -163,6 +166,17 @@ export default function SalesTable({
                 <div className="h-9"></div>
               )}
             </div>
+
+            {sale.balance > 0 && (
+              <button
+                onClick={()=>onConfirmPayment(sale)}
+                className="border border-emerald-300 text-emerald-700 rounded-xl px-3 py-2 text-xs font-medium flex items-center gap-1 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition"
+                title="Confirmar pago del saldo"
+              >
+                <DollarSign size={14}/>
+                Cobrar
+              </button>
+            )}
 
             <button
               onClick={()=>onView(sale)}
