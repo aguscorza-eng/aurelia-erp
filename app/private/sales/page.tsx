@@ -199,9 +199,9 @@ export default function SalesPage(){
 
     setSales(prev => [
 
-      ...prev,
+      newSale,
 
-      newSale
+      ...prev
 
     ]);
 

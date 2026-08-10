@@ -245,7 +245,15 @@ export default function SalesTable({
   const groups = Object.keys(groupsMap)
     .sort()
     .reverse()
-    .map((key)=>({ key, ...groupsMap[key] }));
+    .map((key)=>{
+      const g = groupsMap[key];
+      // Dentro del mes: la venta más reciente primero.
+      g.items.sort((a:any,b:any)=>{
+        const t = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        return t !== 0 ? t : (Number(b.orderNumber) || 0) - (Number(a.orderNumber) || 0);
+      });
+      return { key, ...g };
+    });
 
 
   return (
