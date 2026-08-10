@@ -1,6 +1,8 @@
 "use client";
 
-import { X, Printer, MessageCircle } from "lucide-react";
+import { X, Download, MessageCircle } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 
 interface Props {
@@ -29,9 +31,88 @@ if(!budget) return null;
 
 
 
-function printBudget(){
+function downloadPDF(){
 
-window.print();
+const doc = new jsPDF();
+
+
+// Encabezado
+doc.setFontSize(22);
+doc.text("Aurelia", 14, 20);
+
+doc.setFontSize(10);
+doc.setTextColor(120);
+doc.text("PRESUPUESTO COMERCIAL", 14, 27);
+
+doc.setTextColor(0);
+doc.setFontSize(15);
+doc.text(String(budget.number), 14, 37);
+
+doc.setFontSize(10);
+doc.setTextColor(120);
+doc.text(
+`Fecha: ${new Date(budget.createdAt).toLocaleDateString("es-AR")}`,
+150,
+20
+);
+doc.setTextColor(0);
+
+
+// Datos del cliente
+let y = 50;
+doc.setFontSize(11);
+doc.text(`Cliente: ${budget.client?.name || "-"}`, 14, y);
+
+if(budget.client?.company){ y += 6; doc.text(`Empresa: ${budget.client.company}`, 14, y); }
+if(budget.client?.email){ y += 6; doc.text(`Email: ${budget.client.email}`, 14, y); }
+if(budget.client?.phone){ y += 6; doc.text(`WhatsApp: ${budget.client.phone}`, 14, y); }
+
+
+// Tabla de productos
+autoTable(doc,{
+startY: y + 8,
+head: [["Producto","Cantidad","Precio","Total"]],
+body: (budget.items || []).map((it:any)=>[
+it.name,
+String(it.quantity),
+`$${Number(it.price).toLocaleString("es-AR")}`,
+`$${(it.quantity * Number(it.price)).toLocaleString("es-AR")}`
+]),
+headStyles:{ fillColor:[176,141,87] },
+styles:{ fontSize:10 }
+});
+
+
+let afterY = (doc as any).lastAutoTable.finalY + 12;
+
+
+// Totales
+doc.setFontSize(11);
+doc.text(`Subtotal: $${Number(budget.subtotal).toLocaleString("es-AR")}`, 140, afterY);
+
+afterY += 6;
+doc.text(`Descuento: -$${Number(budget.discountAmount || 0).toLocaleString("es-AR")}`, 140, afterY);
+
+if(budget.bonus > 0){
+afterY += 6;
+doc.text(`Bonificacion: +${budget.bonus} u. sin cargo`, 140, afterY);
+}
+
+afterY += 9;
+doc.setFontSize(14);
+doc.setFont("helvetica","bold");
+doc.text(`TOTAL: $${Number(budget.total).toLocaleString("es-AR")}`, 140, afterY);
+doc.setFont("helvetica","normal");
+
+
+// Condiciones
+afterY += 16;
+doc.setFontSize(9);
+doc.setTextColor(120);
+doc.text("Presupuesto valido por 15 dias. Forma de pago a coordinar.", 14, afterY);
+
+
+doc.save(`${budget.number}.pdf`);
 
 }
 
@@ -97,7 +178,7 @@ $${Number(budget.subtotal).toLocaleString("es-AR")}
 
 Descuento:
 -$${Number(budget.discountAmount || 0).toLocaleString("es-AR")}
-
+${budget.bonus > 0 ? `\nBonificación:\n+${budget.bonus} unidades sin cargo\n` : ""}
 
 TOTAL:
 $${Number(budget.total).toLocaleString("es-AR")}
@@ -832,6 +913,29 @@ Descuento
 
 
 
+{budget.bonus > 0 && (
+
+<div className="flex justify-between text-emerald-700">
+
+<span>
+
+Bonificación
+
+</span>
+
+<strong>
+
++{budget.bonus} u. sin cargo
+
+</strong>
+
+</div>
+
+)}
+
+
+
+
 
 
 
@@ -981,7 +1085,7 @@ WhatsApp
 
 <button
 
-onClick={printBudget}
+onClick={downloadPDF}
 
 className="
 bg-stone-900
@@ -998,9 +1102,9 @@ font-semibold
 >
 
 
-<Printer size={18}/>
+<Download size={18}/>
 
-Imprimir
+Descargar PDF
 
 </button>
 

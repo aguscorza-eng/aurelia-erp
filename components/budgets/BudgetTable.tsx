@@ -43,17 +43,22 @@ loadBudgets();
 
 
 
-function loadBudgets(){
+async function loadBudgets(){
 
 
-const data = JSON.parse(
+try{
 
-localStorage.getItem("budgets") || "[]"
+const res = await fetch("/api/budgets");
 
-);
+const data = await res.json();
 
+if(res.ok){
+setBudgets(data.data || []);
+}
 
-setBudgets(data);
+}catch(error){
+console.error(error);
+}
 
 
 }
@@ -64,7 +69,7 @@ setBudgets(data);
 
 
 
-function deleteBudget(id:any){
+async function deleteBudget(id:any){
 
 
 const confirmDelete = window.confirm(
@@ -79,27 +84,25 @@ if(!confirmDelete) return;
 
 
 
+try{
 
-const updated = budgets.filter(
+const res = await fetch(`/api/budgets/${id}`,{
+method:"DELETE"
+});
 
-(item)=>item.id !== id
+if(!res.ok){
+const data = await res.json();
+console.error(data.error);
+alert("Error al eliminar el presupuesto");
+return;
+}
 
-);
+setBudgets((prev)=>prev.filter((item)=>item.id !== id));
 
-
-
-
-localStorage.setItem(
-
-"budgets",
-
-JSON.stringify(updated)
-
-);
-
-
-
-setBudgets(updated);
+}catch(error){
+console.error(error);
+alert("Error de conexión");
+}
 
 
 }
@@ -182,14 +185,23 @@ return;
 }
 
 
-const updated = budgets.map((b:any)=>
+// Marcamos el presupuesto como convertido en la base.
+await fetch(`/api/budgets/${budget.id}`,{
+method:"PATCH",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+status:"CONVERTIDO",
+saleId:data.data.id
+})
+});
+
+setBudgets((prev:any[])=>prev.map((b:any)=>
 b.id === budget.id
 ? { ...b, status:"CONVERTIDO", saleId:data.data.id }
 : b
-);
-
-localStorage.setItem("budgets", JSON.stringify(updated));
-setBudgets(updated);
+));
 
 alert("✅ Venta generada. Ya aparece en la sección Ventas.");
 

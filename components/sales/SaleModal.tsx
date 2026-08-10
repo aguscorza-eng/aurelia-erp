@@ -56,6 +56,14 @@ const [selectedProduct,setSelectedProduct] = useState<any>(null);
 
   const [showClients,setShowClients] = useState(false);
 
+  const [showNewClient,setShowNewClient] = useState(false);
+
+  const [newClientName,setNewClientName] = useState("");
+
+  const [newClientPhone,setNewClientPhone] = useState("");
+
+  const [newClientEmail,setNewClientEmail] = useState("");
+
 
 
   const [products,setProducts] = useState<OrderProduct[]>([]);
@@ -195,6 +203,75 @@ useEffect(()=>{
 
 
 
+
+
+
+
+  function createQuickClient(){
+
+
+    const name = newClientName.trim();
+
+
+    if(!name){
+
+      alert("Ingresá al menos el nombre del cliente");
+
+      return;
+
+    }
+
+
+    const client = {
+
+      id:Date.now(),
+
+      firstName:name,
+
+      lastName:"",
+
+      company:"",
+
+      name,
+
+      phone:newClientPhone.trim(),
+
+      email:newClientEmail.trim(),
+
+      notes:"",
+
+      createdAt:new Date().toISOString()
+
+    };
+
+
+    const stored = JSON.parse(
+      localStorage.getItem("clients") || "[]"
+    );
+
+    const updated = [...stored, client];
+
+    localStorage.setItem(
+      "clients",
+      JSON.stringify(updated)
+    );
+
+
+    // Actualizamos la lista y seleccionamos el cliente recién creado.
+    setClients(updated);
+    setSelectedClient(client);
+    setClient(name);
+    setSearchClient("");
+    setShowClients(false);
+
+
+    setNewClientName("");
+    setNewClientPhone("");
+    setNewClientEmail("");
+    setShowNewClient(false);
+
+
+  }
 
 
 
@@ -459,6 +536,62 @@ useEffect(()=>{
 
 
 
+
+
+        {/* Crear cliente rápido */}
+        <div>
+
+          <button
+            type="button"
+            onClick={()=>setShowNewClient((v)=>!v)}
+            className="text-sm font-medium text-[#B08D57] hover:underline"
+          >
+            {showNewClient ? "Cancelar cliente nuevo" : "+ Cliente nuevo"}
+          </button>
+
+
+          {showNewClient && (
+
+            <div className="mt-3 border rounded-2xl p-4 space-y-3 bg-stone-50">
+
+              <input
+                placeholder="Nombre y apellido"
+                value={newClientName}
+                onChange={(e)=>setNewClientName(e.target.value)}
+                className="w-full border rounded-xl p-3"
+              />
+
+              <div className="grid grid-cols-2 gap-3">
+
+                <input
+                  placeholder="WhatsApp"
+                  value={newClientPhone}
+                  onChange={(e)=>setNewClientPhone(e.target.value)}
+                  className="border rounded-xl p-3"
+                />
+
+                <input
+                  placeholder="Email"
+                  value={newClientEmail}
+                  onChange={(e)=>setNewClientEmail(e.target.value)}
+                  className="border rounded-xl p-3"
+                />
+
+              </div>
+
+              <button
+                type="button"
+                onClick={createQuickClient}
+                className="w-full bg-stone-900 text-white py-2 rounded-xl font-medium"
+              >
+                Guardar cliente
+              </button>
+
+            </div>
+
+          )}
+
+        </div>
 
 
         <div className="border rounded-xl p-4 space-y-3">

@@ -178,3 +178,46 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Budget {
+  id     String @id @default(cuid())
+  number String @unique
+
+  // Datos del cliente guardados como snapshot (los clientes viven en
+  // localStorage, por eso no usamos una relación con Customer).
+  clientRef     String?
+  clientName    String
+  clientCompany String?
+  clientPhone   String?
+  clientEmail   String?
+
+  subtotal       Decimal @default(0)
+  discount       Decimal @default(0)
+  discountAmount Decimal @default(0)
+  bonus          Int     @default(0)
+  total          Decimal @default(0)
+
+  preparationDays String?
+  deliveryDate    String?
+  customerNote    String?
+
+  status String  @default("PENDIENTE")
+  saleId String?
+
+  items BudgetItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BudgetItem {
+  id String @id @default(cuid())
+
+  budgetId String
+  budget   Budget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  productId String
+  name      String
+  quantity  Int
+  price     Decimal
+}

@@ -109,6 +109,15 @@ const [deliveryDate,setDeliveryDate]=useState("");
 const [customerNote,setCustomerNote]=useState("");
 
 
+const [showNewClient,setShowNewClient]=useState(false);
+
+const [newClientName,setNewClientName]=useState("");
+
+const [newClientPhone,setNewClientPhone]=useState("");
+
+const [newClientEmail,setNewClientEmail]=useState("");
+
+
 
 
 
@@ -187,28 +196,31 @@ setProducts(terminados);
     // Si es nuevo, limpiamos el formulario para no arrastrar datos viejos.
     if(budgetId){
 
-      const allBudgets = JSON.parse(
-        localStorage.getItem("budgets") || "[]"
-      );
+      try{
 
-      const current = allBudgets.find(
-        (x:any)=>String(x.id)===String(budgetId)
-      );
+        const res = await fetch(`/api/budgets/${budgetId}`);
+        const data = await res.json();
 
-      if(current){
+        if(res.ok){
 
-        const cli = clientsData.find(
-          (c:any)=>String(c.id)===String(current.client?.id)
-        ) || current.client || null;
+          const current = data.data;
 
-        setSelectedClient(cli);
-        setItems(current.items || []);
-        setDiscount(current.discount || 0);
-        setBonus(current.bonus || 0);
-        setPreparationDays(current.preparationDays || "");
-        setDeliveryDate(current.deliveryDate || "");
-        setCustomerNote(current.customerNote || "");
+          const cli = clientsData.find(
+            (c:any)=>String(c.id)===String(current.client?.id)
+          ) || current.client || null;
 
+          setSelectedClient(cli);
+          setItems(current.items || []);
+          setDiscount(current.discount || 0);
+          setBonus(current.bonus || 0);
+          setPreparationDays(current.preparationDays || "");
+          setDeliveryDate(current.deliveryDate || "");
+          setCustomerNote(current.customerNote || "");
+
+        }
+
+      }catch(error){
+        console.error(error);
       }
 
     }else{
@@ -233,6 +245,72 @@ setProducts(terminados);
 
 
 
+
+
+
+
+function createQuickClient(){
+
+
+const name = newClientName.trim();
+
+
+if(!name){
+
+alert("Ingresá al menos el nombre del cliente");
+
+return;
+
+}
+
+
+const client:any = {
+
+id:Date.now(),
+
+firstName:name,
+
+lastName:"",
+
+company:"",
+
+name,
+
+phone:newClientPhone.trim(),
+
+email:newClientEmail.trim(),
+
+notes:"",
+
+createdAt:new Date().toISOString()
+
+};
+
+
+const stored = JSON.parse(
+localStorage.getItem("clients") || "[]"
+);
+
+const updated = [...stored, client];
+
+localStorage.setItem(
+"clients",
+JSON.stringify(updated)
+);
+
+
+// Actualizamos la lista y seleccionamos el cliente recién creado.
+setClients(updated);
+setSelectedClient(client);
+
+
+setNewClientName("");
+setNewClientPhone("");
+setNewClientEmail("");
+setShowNewClient(false);
+
+
+}
 
 
 
@@ -350,7 +428,7 @@ discountAmount;
 
 
 
-function saveBudget(){
+async function saveBudget(){
 
 
 
@@ -477,44 +555,55 @@ new Date().toISOString()
 
 
 
-if(budgetId){
+// Datos que enviamos a la API (sin id/número/estado: los maneja el server).
+const payload = {
+  client:budget.client,
+  items,
+  subtotal,
+  discount,
+  discountAmount,
+  bonus,
+  preparationDays,
+  deliveryDate,
+  customerNote,
+  total
+};
 
-// Editar: reemplazamos el presupuesto conservando número, fecha y estado.
-const updated = budgets.map((b:any)=>
 
-String(b.id) === String(budgetId)
+try{
 
-? {
-    ...b,
-    client:budget.client,
-    items,
-    subtotal,
-    discount,
-    discountAmount,
-    bonus,
-    preparationDays,
-    deliveryDate,
-    customerNote,
-    total
+  const res = budgetId
+
+    ? await fetch(`/api/budgets/${budgetId}`,{
+        method:"PATCH",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify(payload)
+      })
+
+    : await fetch("/api/budgets",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify(payload)
+      });
+
+
+  const data = await res.json();
+
+
+  if(!res.ok){
+    console.error(data.error);
+    alert("Error al guardar el presupuesto");
+    return;
   }
 
-: b
 
-);
+  onClose();
 
-localStorage.setItem("budgets", JSON.stringify(updated));
 
-}else{
-
-localStorage.setItem(
-"budgets",
-JSON.stringify([...budgets, budget])
-);
-
+}catch(error){
+  console.error(error);
+  alert("Error de conexión");
 }
-
-
-onClose();
 
 
 
@@ -752,6 +841,62 @@ text-sm
 
 
 
+
+
+{/* Crear cliente rápido */}
+<div className="mb-4">
+
+<button
+type="button"
+onClick={()=>setShowNewClient((v)=>!v)}
+className="text-sm font-medium text-[#B08D57] hover:underline"
+>
+{showNewClient ? "Cancelar cliente nuevo" : "+ Cliente nuevo"}
+</button>
+
+
+{showNewClient && (
+
+<div className="mt-3 border rounded-2xl p-4 space-y-3 bg-stone-50">
+
+<input
+placeholder="Nombre y apellido"
+value={newClientName}
+onChange={(e)=>setNewClientName(e.target.value)}
+className="w-full border rounded-xl p-3"
+/>
+
+<div className="grid grid-cols-2 gap-3">
+
+<input
+placeholder="WhatsApp"
+value={newClientPhone}
+onChange={(e)=>setNewClientPhone(e.target.value)}
+className="border rounded-xl p-3"
+/>
+
+<input
+placeholder="Email"
+value={newClientEmail}
+onChange={(e)=>setNewClientEmail(e.target.value)}
+className="border rounded-xl p-3"
+/>
+
+</div>
+
+<button
+type="button"
+onClick={createQuickClient}
+className="w-full bg-stone-900 text-white py-2 rounded-xl font-medium"
+>
+Guardar cliente
+</button>
+
+</div>
+
+)}
+
+</div>
 
 
 <div className="
@@ -1169,6 +1314,24 @@ Descuento:
 </strong>
 
 </p>
+
+
+
+{bonus > 0 && (
+
+<p className="text-emerald-700">
+
+Bonificación:
+
+<strong>
+
+{" "}+{bonus} unidad{bonus !== 1 ? "es" : ""} sin cargo
+
+</strong>
+
+</p>
+
+)}
 
 
 
