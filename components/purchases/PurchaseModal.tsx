@@ -183,30 +183,38 @@ export default function PurchaseModal({
         </select>
 
 
-        <div className="grid grid-cols-4 gap-3">
+        <input
+          value={insumo}
+          onChange={(e)=>setInsumo(e.target.value)}
+          placeholder="Insumo (ej: Cera de soja)"
+          className="w-full border rounded-xl p-3"
+        />
 
-          <input
-            value={insumo}
-            onChange={(e)=>setInsumo(e.target.value)}
-            placeholder="Insumo (ej: Cera de soja)"
-            className="border rounded-xl p-3 col-span-2"
-          />
+        <div className="grid grid-cols-2 gap-3 mt-3">
 
-          <input
-            type="number"
-            value={quantity}
-            onChange={(e)=>setQuantity(Number(e.target.value))}
-            placeholder="Cantidad"
-            className="border rounded-xl p-3"
-          />
+          <div>
+            <label className="text-xs text-stone-500 block mb-1">
+              Cantidad
+            </label>
+            <input
+              type="number"
+              value={quantity}
+              onChange={(e)=>setQuantity(Number(e.target.value))}
+              className="w-full border rounded-xl p-3"
+            />
+          </div>
 
-          <input
-            type="number"
-            value={cost}
-            onChange={(e)=>setCost(Number(e.target.value))}
-            placeholder="Costo"
-            className="border rounded-xl p-3"
-          />
+          <div>
+            <label className="text-xs text-stone-500 block mb-1">
+              Costo
+            </label>
+            <input
+              type="number"
+              value={cost}
+              onChange={(e)=>setCost(Number(e.target.value))}
+              className="w-full border rounded-xl p-3"
+            />
+          </div>
 
         </div>
 
