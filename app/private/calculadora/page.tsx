@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
 
-import { Plus, Trash2, Calculator } from "lucide-react";
+import { Plus, Trash2, Calculator, Save } from "lucide-react";
 
 
 const money = (n:number)=>
@@ -30,6 +30,27 @@ export default function CalculadoraPage(){
 
   const [multMay,setMultMay] = useState(3);
   const [multMin,setMultMin] = useState(4);
+
+
+  // Recetas guardadas
+  const [recipes,setRecipes] = useState<any[]>([]);
+  const [currentId,setCurrentId] = useState<string|null>(null);
+  const [recipeName,setRecipeName] = useState("");
+
+
+  useEffect(()=>{
+    loadRecipes();
+  },[]);
+
+  async function loadRecipes(){
+    try{
+      const res = await fetch("/api/recipes");
+      const data = await res.json();
+      if(res.ok) setRecipes(data.data || []);
+    }catch(error){
+      console.error(error);
+    }
+  }
 
 
   const insumoCost = (i:Insumo)=>
@@ -57,6 +78,86 @@ export default function CalculadoraPage(){
   }
 
 
+  function nuevaReceta(){
+    setCurrentId(null);
+    setRecipeName("");
+    setInsumos([{ name:"", grams:0, pricePerKg:0 }]);
+    setOtros([]);
+    setMultMay(3);
+    setMultMin(4);
+  }
+
+  function cargarReceta(id:string){
+    if(!id){ nuevaReceta(); return; }
+    const r = recipes.find((x)=>x.id===id);
+    if(!r) return;
+    const d = r.data || {};
+    setCurrentId(r.id);
+    setRecipeName(r.name || "");
+    setInsumos(d.insumos || []);
+    setOtros(d.otros || []);
+    setMultMay(d.multMay ?? 3);
+    setMultMin(d.multMin ?? 4);
+  }
+
+  async function guardarReceta(){
+    if(!recipeName.trim()){
+      alert("Ponele un nombre a la receta");
+      return;
+    }
+
+    const payload = {
+      name: recipeName.trim(),
+      data: { insumos, otros, multMay, multMin }
+    };
+
+    try{
+      const res = currentId
+        ? await fetch(`/api/recipes/${currentId}`,{
+            method:"PUT",
+            headers:{ "Content-Type":"application/json" },
+            body:JSON.stringify(payload)
+          })
+        : await fetch("/api/recipes",{
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body:JSON.stringify(payload)
+          });
+
+      const data = await res.json();
+
+      if(!res.ok){
+        alert("Error al guardar la receta");
+        return;
+      }
+
+      setCurrentId(data.data.id);
+      await loadRecipes();
+      alert(currentId ? "Receta actualizada ✅" : "Receta guardada ✅");
+
+    }catch(error){
+      console.error(error);
+      alert("Error de conexión");
+    }
+  }
+
+  async function eliminarReceta(){
+    if(!currentId) return;
+    const ok = window.confirm(`¿Eliminar la receta "${recipeName}"?`);
+    if(!ok) return;
+
+    try{
+      const res = await fetch(`/api/recipes/${currentId}`,{ method:"DELETE" });
+      if(!res.ok){ alert("Error al eliminar"); return; }
+      nuevaReceta();
+      await loadRecipes();
+    }catch(error){
+      console.error(error);
+      alert("Error de conexión");
+    }
+  }
+
+
   return (
 
     <main className="flex h-screen bg-[#F8F8F6]">
@@ -75,6 +176,58 @@ export default function CalculadoraPage(){
             <p className="text-stone-500">
               Cargá los insumos y te dice el costo y el precio sugerido
             </p>
+          </div>
+
+
+          {/* RECETAS GUARDADAS */}
+          <div className="bg-white border rounded-3xl p-5 flex flex-wrap gap-3 items-end">
+            <div className="flex-1 min-w-[200px]">
+              <label className="text-xs text-stone-500 block mb-1">Receta guardada</label>
+              <select
+                value={currentId || ""}
+                onChange={(e)=>cargarReceta(e.target.value)}
+                className="w-full border rounded-xl p-2.5"
+              >
+                <option value="">— Nueva receta —</option>
+                {recipes.map((r)=>(
+                  <option key={r.id} value={r.id}>{r.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex-1 min-w-[200px]">
+              <label className="text-xs text-stone-500 block mb-1">Nombre de la receta</label>
+              <input
+                value={recipeName}
+                onChange={(e)=>setRecipeName(e.target.value)}
+                placeholder="Ej: Caramelera con cera"
+                className="w-full border rounded-xl p-2.5"
+              />
+            </div>
+
+            <button
+              onClick={guardarReceta}
+              className="bg-stone-900 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2"
+            >
+              <Save size={16}/>
+              {currentId ? "Actualizar" : "Guardar"}
+            </button>
+
+            {currentId && (
+              <button
+                onClick={eliminarReceta}
+                className="border border-red-200 text-red-600 px-4 py-2.5 rounded-xl"
+              >
+                Eliminar
+              </button>
+            )}
+
+            <button
+              onClick={nuevaReceta}
+              className="border px-4 py-2.5 rounded-xl"
+            >
+              Nueva
+            </button>
           </div>
 
 
