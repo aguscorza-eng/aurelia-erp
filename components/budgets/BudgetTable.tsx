@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Eye, Pencil, Trash2, ShoppingCart } from "lucide-react";
+import { Eye, Pencil, Trash2, ShoppingCart, Download } from "lucide-react";
 
 import BudgetDetailModal from "./BudgetDetailModal";
+import { generateBudgetPDF } from "@/lib/budgetPdf";
 
 
 interface Props {
@@ -485,6 +486,34 @@ title="Ver presupuesto"
 
 
 
+
+
+
+
+{/* DESCARGAR PDF */}
+
+<button
+
+onClick={()=>generateBudgetPDF(budget)}
+
+className="
+h-9
+w-9
+rounded-lg
+border
+flex
+items-center
+justify-center
+hover:bg-stone-100
+"
+
+title="Descargar PDF"
+
+>
+
+<Download size={16}/>
+
+</button>
 
 
 
