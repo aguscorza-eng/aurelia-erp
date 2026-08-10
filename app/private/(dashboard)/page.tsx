@@ -304,8 +304,8 @@ export default function Home(){
                         {sale.customer}
                       </p>
 
-                      <p className="text-xs text-stone-400">
-                        Venta registrada
+                      <p className="text-xs text-stone-400 truncate max-w-[240px]">
+                        {sale.concepto || "Venta registrada"}
                       </p>
 
                     </div>

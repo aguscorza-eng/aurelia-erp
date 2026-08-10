@@ -306,7 +306,14 @@ export async function GET() {
 
           total:Number(sale.total),
 
-          date:sale.createdAt
+          date:sale.createdAt,
+
+          concepto:
+            sale.detail
+            || (sale.items?.length
+                  ? sale.items.map((i)=>i.product?.name).filter(Boolean).join(", ")
+                  : "")
+            || "Venta registrada"
 
         }))
 
