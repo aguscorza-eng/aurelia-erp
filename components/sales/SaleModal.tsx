@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 
 interface Props {
@@ -363,6 +363,20 @@ useEffect(()=>{
 
 
 
+  const clientBoxRef = useRef<HTMLDivElement>(null);
+
+  // Cierra la lista de clientes al hacer click fuera del buscador.
+  useEffect(()=>{
+    function handleClickOutside(e:MouseEvent){
+      if(clientBoxRef.current && !clientBoxRef.current.contains(e.target as Node)){
+        setShowClients(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return ()=>document.removeEventListener("mousedown", handleClickOutside);
+  },[]);
+
+
   const filteredClients = clients.filter((item)=>
 
 
@@ -427,7 +441,7 @@ useEffect(()=>{
 
 
 
-        <div className="relative">
+        <div className="relative" ref={clientBoxRef}>
 
 
           <input
