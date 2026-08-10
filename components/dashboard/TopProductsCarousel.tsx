@@ -7,138 +7,69 @@ import { TrendingUp } from "lucide-react";
 
 
 
-export default function TopProductsCarousel(){
+type TopProduct = {
+  id: string;
+  name: string;
+  price: number;
+  units: number;
+};
 
 
-  const [products,setProducts] = useState<any[]>([]);
-
-  const [current,setCurrent] = useState(0);
-
-
+interface Props {
+  products?: TopProduct[];
+}
 
 
 
+const money = (n: number) =>
+  `$${Number(n || 0).toLocaleString("es-AR", {
+    maximumFractionDigits: 0
+  })}`;
+
+
+
+export default function TopProductsCarousel({
+  products = []
+}: Props){
+
+
+  const [current, setCurrent] = useState(0);
+
+
+
+  // Si cambia la lista, aseguramos que el índice no quede fuera de rango.
   useEffect(()=>{
 
+    setCurrent(0);
 
-    const data = localStorage.getItem("sales");
-
-
-    if(!data) return;
+  },[products.length]);
 
 
 
-    const sales = JSON.parse(data);
-
-
-    const grouped:any = {};
-
-
-
-    sales.forEach((sale:any)=>{
-
-
-      sale.products?.forEach((product:any)=>{
-
-
-        grouped[product.name] =
-
-          (grouped[product.name] || 0)
-
-          + product.quantity;
-
-
-
-      });
-
-
-
-    });
-
-
-
-
-
-    const ranking = Object.keys(grouped)
-
-      .map(name=>({
-
-        name,
-
-        sales:grouped[name]
-
-      }))
-
-      .sort((a,b)=>b.sales-a.sales)
-
-      .slice(0,5)
-
-      .map((item,index)=>({
-
-
-        rank:`#${index+1}`,
-
-        name:item.name,
-
-        sales:item.sales
-
-
-      }));
-
-
-
-
-    setProducts(ranking);
-
-
-
-  },[]);
-
-
-
-
-
-
-
+  // Auto-desliza cada 4 segundos mientras haya más de un producto.
   useEffect(()=>{
 
-
-    if(products.length<=1) return;
-
+    if(products.length <= 1) return;
 
 
-    const timer=setInterval(()=>{
+    const timer = setInterval(()=>{
 
-
-      setCurrent(prev=>
-
-        (prev+1)%products.length
-
-      );
-
+      setCurrent(prev => (prev + 1) % products.length);
 
     },4000);
 
 
-
     return ()=>clearInterval(timer);
 
-
-
-  },[products]);
-
+  },[products.length]);
 
 
 
-
-
-
-  if(products.length===0){
-
+  if(products.length === 0){
 
     return (
 
-      <div className="bg-white border rounded-3xl p-6">
+      <div className="bg-white border border-stone-100 rounded-3xl p-7 h-full flex items-center justify-center">
 
         <p className="text-stone-400">
 
@@ -150,11 +81,7 @@ export default function TopProductsCarousel(){
 
     );
 
-
   }
-
-
-
 
 
 
@@ -162,60 +89,44 @@ export default function TopProductsCarousel(){
 
 
 
-
-
-
-
-
   return (
 
 
-
-    <div className="bg-white border border-stone-200 rounded-3xl p-6 h-[380px] flex flex-col">
-
-
+    <div className="bg-white border border-stone-100 rounded-3xl p-7 shadow-sm shadow-stone-200/40 h-full flex flex-col">
 
 
 
       {/* HEADER */}
-
 
       <div className="flex justify-between items-start">
 
 
         <div>
 
+          <p className="text-xs tracking-widest text-stone-400 font-medium">
 
-          <p className="text-xs text-stone-500">
-
-            Ranking
+            RANKING
 
           </p>
 
 
-
-          <h2 className="text-xl font-semibold">
+          <h2 className="text-lg font-bold mt-1 text-stone-900">
 
             Producto líder
 
           </h2>
 
-
         </div>
-
-
 
 
 
         <div className="bg-[#F7F2EB] rounded-full px-3 py-1">
 
-
           <span className="font-bold text-[#B08D57]">
 
-            {product.rank}
+            #{current + 1}
 
           </span>
-
 
         </div>
 
@@ -224,18 +135,11 @@ export default function TopProductsCarousel(){
 
 
 
-
-
-
-
       {/* PRODUCTO */}
 
+      <div className="mt-6">
 
-
-      <div className="mt-8">
-
-
-        <h3 className="text-2xl font-semibold leading-tight">
+        <h3 className="text-2xl font-semibold leading-tight text-stone-900">
 
           {product.name}
 
@@ -248,47 +152,52 @@ export default function TopProductsCarousel(){
 
         </p>
 
-
       </div>
-
-
-
-
 
 
 
       {/* DATOS */}
 
-
-
-      <div className="mt-8 space-y-4">
+      <div className="mt-6 space-y-4">
 
 
         <div className="flex justify-between">
 
-
           <span className="text-stone-500">
 
-            Unidades
+            Unidades vendidas
 
           </span>
 
+          <strong className="text-stone-900 tabular-nums">
 
-          <strong>
-
-            {product.sales}
+            {product.units}
 
           </strong>
-
 
         </div>
 
 
 
+        <div className="flex justify-between">
+
+          <span className="text-stone-500">
+
+            Precio
+
+          </span>
+
+          <strong className="text-stone-900 tabular-nums">
+
+            {product.price > 0 ? money(product.price) : "--"}
+
+          </strong>
+
+        </div>
+
 
 
         <div className="flex justify-between">
-
 
           <span className="text-stone-500">
 
@@ -296,19 +205,13 @@ export default function TopProductsCarousel(){
 
           </span>
 
-
-
           <span className="flex items-center gap-2 text-emerald-600 font-semibold">
-
 
             <TrendingUp size={17}/>
 
             TOP
 
-
           </span>
-
-
 
         </div>
 
@@ -317,64 +220,31 @@ export default function TopProductsCarousel(){
 
 
 
-
-
-
-
-      {/* LINEA */}
-
-
-      <div className="border-t border-stone-200 my-auto" />
-
-
-
-
-
-
-
       {/* PAGINADOR */}
 
+      <div className="flex justify-center gap-2 pt-5 mt-auto">
 
-      <div className="flex justify-center gap-2 pt-5">
 
-
-        {products.map((_,index)=>(
-
+        {products.map((_, index)=>(
 
           <button
 
-
             key={index}
-
 
             onClick={()=>setCurrent(index)}
 
-
             className={`rounded-full transition-all ${
-
-              current===index
-
-              ?
-
-              "w-8 h-2 bg-[#B08D57]"
-
-              :
-
-              "w-2 h-2 bg-stone-300"
-
+              current === index
+                ? "w-8 h-2 bg-[#B08D57]"
+                : "w-2 h-2 bg-stone-300"
             }`}
 
-
           />
-
 
         ))}
 
 
       </div>
-
-
-
 
 
     </div>

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
 import SalesChart from "@/components/dashboard/SalesChart";
+import TopProductsCarousel from "@/components/dashboard/TopProductsCarousel";
 
 import {
   AlertTriangle,
@@ -86,11 +87,13 @@ export default function Home(){
 
   const sales = dashboard.recentSales || [];
 
-  const products = dashboard.products || [];
+  const topProducts = dashboard.topProducts || [];
 
   const totalSales = dashboard.salesMonth || 0;
 
   const gain = dashboard.profit || 0;
+
+  const pendingBalance = dashboard.pendingBalance || 0;
 
   const unitsSold = dashboard.unitsSold || 0;
 
@@ -165,7 +168,7 @@ export default function Home(){
 
 
 
-            <div className="grid grid-cols-4 gap-5 mt-4">
+            <div className="grid grid-cols-5 gap-5 mt-4">
 
 
               <Card
@@ -185,6 +188,13 @@ export default function Home(){
                   :
                   <TrendingDown size={19}/>
                 }
+              />
+
+
+              <Card
+                title="Saldo pendiente"
+                value={money(pendingBalance)}
+                icon={<Receipt size={19}/>}
               />
 
 
@@ -223,35 +233,14 @@ export default function Home(){
 
               <div className="col-span-2">
 
-                <SalesChart sales={sales}/>
+                <SalesChart data={dashboard.monthlySales || []}/>
 
               </div>
 
 
 
 
-              <div className="bg-white rounded-3xl p-7 border border-stone-100">
-
-
-                <p className="text-xs tracking-widest text-stone-400">
-                  PRODUCTO DESTACADO
-                </p>
-
-
-                <h2 className="text-lg font-bold mt-3">
-
-                  {
-                    products.length
-                    ?
-                    products[0].name
-                    :
-                    "Sin datos"
-                  }
-
-                </h2>
-
-
-              </div>
+              <TopProductsCarousel products={topProducts}/>
 
 
             </div>

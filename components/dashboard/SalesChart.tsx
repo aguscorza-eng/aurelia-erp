@@ -13,12 +13,16 @@ ResponsiveContainer
 
 interface Props {
 
-sales:any[];
+// Datos ya calculados por mes (formato { name, ventas }).
+data?:{ name:string; ventas:number }[];
+
+// Alternativa: ventas crudas para calcular en el cliente.
+sales?:any[];
 
 }
 
 
-export default function SalesChart({sales}:Props){
+export default function SalesChart({data:monthlyData,sales=[]}:Props){
 
 
 
@@ -39,7 +43,9 @@ const months=[
 
 
 
-const data = months.map((month,index)=>{
+// Si nos pasan los datos ya calculados, los usamos directo.
+// Si no, los calculamos a partir de las ventas crudas.
+const data = monthlyData ?? months.map((month,index)=>{
 
 
 const total=sales

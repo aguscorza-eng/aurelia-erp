@@ -17,9 +17,15 @@ interface Props {
 
 type OrderProduct = {
 
+  id:string;
+
   name:string;
 
   quantity:number;
+
+  price:number;
+
+  cost:number;
 
 };
 
@@ -37,7 +43,8 @@ export default function SaleModal({
 
 }:Props){
 
-
+const [availableProducts,setAvailableProducts] = useState<any[]>([]);
+const [selectedProduct,setSelectedProduct] = useState<any>(null);
 
   const [client,setClient] = useState("");
 
@@ -84,7 +91,39 @@ export default function SaleModal({
 
   },[open]);
 
+useEffect(()=>{
 
+  async function loadProducts(){
+
+    try{
+
+      const res = await fetch("/api/products");
+
+      const data = await res.json();
+
+      if(data.ok){
+
+        setAvailableProducts(data.data);
+
+      }
+
+    }catch(error){
+
+      console.error(error);
+
+    }
+
+  }
+
+
+  if(open){
+
+    loadProducts();
+
+  }
+
+
+},[open]);
 
 
 
@@ -101,33 +140,39 @@ export default function SaleModal({
 
   function addProduct(){
 
-
-    if(!productName.trim()) return;
-
+  if(!selectedProduct) return;
 
 
-    setProducts((prev)=>[
+  setProducts((prev)=>[
 
-      ...prev,
+    ...prev,
 
-      {
+    {
 
-        name:productName,
+      id:selectedProduct.id,
 
-        quantity
+      name:selectedProduct.name,
 
-      }
+      quantity,
 
-    ]);
+      price:Number(selectedProduct.price),
+
+      cost:Number(selectedProduct.cost)
+
+    }
+
+  ]);
+
+
+  setSelectedProduct(null);
+
+  setQuantity(1);
+
+}
 
 
 
-    setProductName("");
-
-    setQuantity(1);
-
-
-  }
+  
 
 
 
@@ -430,35 +475,48 @@ export default function SaleModal({
 
           <div className="grid grid-cols-3 gap-3">
 
+  <select
+    className="border rounded-xl p-3 col-span-2"
+    value={selectedProduct?.id || ""}
+    onChange={(e)=>{
 
-            <input
+      const product = availableProducts.find(
+        (p)=>p.id === e.target.value
+      );
 
-              className="border rounded-xl p-3 col-span-2"
+      setSelectedProduct(product || null);
 
-              placeholder="Producto"
+    }}
+  >
 
-              value={productName}
+    <option value="">
+      Seleccionar producto
+    </option>
 
-              onChange={(e)=>setProductName(e.target.value)}
+    {availableProducts.map((product)=>(
 
-            />
+      <option
+        key={product.id}
+        value={product.id}
+      >
 
+        {product.name}
 
+      </option>
 
-            <input
+    ))}
 
-              type="number"
-
-              className="border rounded-xl p-3"
-
-              value={quantity}
-
-              onChange={(e)=>setQuantity(Number(e.target.value))}
-
-            />
+  </select>
 
 
-          </div>
+  <input
+    type="number"
+    className="border rounded-xl p-3"
+    value={quantity}
+    onChange={(e)=>setQuantity(Number(e.target.value))}
+  />
+
+</div>
 
 
 
@@ -529,38 +587,50 @@ export default function SaleModal({
         <div className="grid grid-cols-2 gap-4">
 
 
-          <input
+  <div>
 
-            type="number"
+    <label className="text-sm text-stone-500 block mb-1">
+      Precio de venta total
+    </label>
 
-            className="border rounded-xl p-3"
+    <input
 
-            placeholder="Total"
+      type="number"
 
-            value={total}
+      className="border rounded-xl p-3 w-full"
 
-            onChange={(e)=>setTotal(Number(e.target.value))}
+      value={total}
 
-          />
+      onChange={(e)=>setTotal(Number(e.target.value))}
 
+    />
 
-
-          <input
-
-            type="number"
-
-            className="border rounded-xl p-3"
-
-            placeholder="Anticipo"
-
-            value={advance}
-
-            onChange={(e)=>setAdvance(Number(e.target.value))}
-
-          />
+  </div>
 
 
-        </div>
+
+  <div>
+
+    <label className="text-sm text-stone-500 block mb-1">
+      Anticipo recibido
+    </label>
+
+    <input
+
+      type="number"
+
+      className="border rounded-xl p-3 w-full"
+
+      value={advance}
+
+      onChange={(e)=>setAdvance(Number(e.target.value))}
+
+    />
+
+  </div>
+
+
+</div>
 
 
 

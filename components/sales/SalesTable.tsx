@@ -19,7 +19,7 @@ interface Props {
 
   onEdit:(sale:any)=>void;
 
-  onDelete:(id:number)=>void;
+  onDelete:(id:string)=>void;
 
   onReceipt:(sale:any)=>void;
 

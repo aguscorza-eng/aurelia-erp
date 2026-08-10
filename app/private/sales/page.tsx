@@ -42,13 +42,29 @@ export default function SalesPage(){
 
   useEffect(()=>{
 
-    const data = localStorage.getItem("sales");
+    async function loadSales(){
 
-    if(data){
+      try{
 
-      setSales(JSON.parse(data));
+        const res = await fetch("/api/sales");
+
+        const data = await res.json();
+
+        if(res.ok){
+
+          setSales(data.data || []);
+
+        }
+
+      }catch(error){
+
+        console.error(error);
+
+      }
 
     }
+
+    loadSales();
 
   },[]);
 
@@ -142,49 +158,144 @@ export default function SalesPage(){
 
 
 
-  function addSale(order:any){
+  async function addSale(order:any){
+
+  try {
 
 
-    const newSale = {
+    const res = await fetch("/api/sales",{
 
+      method:"POST",
 
-      id:Date.now(),
+      headers:{
+        "Content-Type":"application/json"
+      },
 
+      body:JSON.stringify(order)
 
-      number:`PED-${String(sales.length + 1).padStart(6,"0")}`,
-
-
-      createdAt:new Date().toISOString(),
-
-
-      ...order
-
-
-    };
+    });
 
 
 
-    const newList=[
+    const data = await res.json();
 
-      ...sales,
+
+
+    if(!res.ok){
+
+      console.error(data.error);
+
+      alert("Error guardando venta");
+
+      return;
+
+    }
+
+
+
+    const newSale = data.data;
+
+
+
+    setSales(prev => [
+
+      ...prev,
 
       newSale
 
-    ];
+    ]);
 
 
 
-    setSales(newList);
+    
 
 
 
-    localStorage.setItem(
+  } catch(error){
 
-      "sales",
 
-      JSON.stringify(newList)
+    console.error(error);
 
-    );
+    alert("Error de conexión");
+
+
+  }
+
+
+}
+
+
+
+
+
+
+
+  async function updateSale(updated:any){
+
+
+    try{
+
+      const res = await fetch(`/api/sales/${updated.id}`,{
+
+        method:"PATCH",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+          status:updated.status,
+
+          total:updated.total,
+
+          advance:updated.advance,
+
+          balance:updated.balance,
+
+          payment:updated.payment
+
+        })
+
+      });
+
+
+      const data = await res.json();
+
+
+      if(!res.ok){
+
+        console.error(data.error);
+
+        alert("Error actualizando venta");
+
+        return;
+
+      }
+
+
+      setSales((prev)=>
+
+        prev.map((sale)=>
+
+          sale.id === updated.id
+
+            ? data.data
+
+            : sale
+
+        )
+
+      );
+
+
+    }catch(error){
+
+      console.error(error);
+
+      alert("Error de conexión");
+
+    }
 
 
   }
@@ -195,82 +306,60 @@ export default function SalesPage(){
 
 
 
-  function updateSale(updated:any){
+  async function updateStatus(sale:any,status:string){
 
 
-    const newList = sales.map((sale)=>
+    try{
+
+      const res = await fetch(`/api/sales/${sale.id}`,{
+
+        method:"PATCH",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({ status })
+
+      });
 
 
-      sale.id === updated.id
-
-        ? updated
-
-        : sale
+      const data = await res.json();
 
 
-    );
+      if(!res.ok){
+
+        console.error(data.error);
+
+        alert("Error actualizando estado");
+
+        return;
+
+      }
 
 
+      setSales((prev)=>
 
-    setSales(newList);
+        prev.map((item)=>
 
+          item.id === sale.id
 
+            ? data.data
 
-    localStorage.setItem(
+            : item
 
-      "sales",
+        )
 
-      JSON.stringify(newList)
-
-    );
-
-
-  }
+      );
 
 
+    }catch(error){
 
+      console.error(error);
 
+      alert("Error de conexión");
 
-
-
-  function updateStatus(sale:any,status:string){
-
-
-    const updatedSale={
-
-      ...sale,
-
-      status
-
-    };
-
-
-
-    const newList = sales.map((item)=>
-
-
-      item.id === sale.id
-
-        ? updatedSale
-
-        : item
-
-
-    );
-
-
-
-    setSales(newList);
-
-
-
-    localStorage.setItem(
-
-      "sales",
-
-      JSON.stringify(newList)
-
-    );
+    }
 
 
   }
@@ -281,7 +370,7 @@ export default function SalesPage(){
 
 
 
-  function deleteSale(id:number){
+  async function deleteSale(id:string){
 
 
     const confirmDelete = window.confirm(
@@ -296,26 +385,42 @@ export default function SalesPage(){
 
 
 
+    try{
 
-    const newList = sales.filter(
+      const res = await fetch(`/api/sales/${id}`,{
 
-      (sale)=>sale.id !== id
+        method:"DELETE"
 
-    );
-
-
-
-    setSales(newList);
+      });
 
 
+      if(!res.ok){
 
-    localStorage.setItem(
+        const data = await res.json();
 
-      "sales",
+        console.error(data.error);
 
-      JSON.stringify(newList)
+        alert("Error eliminando venta");
 
-    );
+        return;
+
+      }
+
+
+      setSales((prev)=>
+
+        prev.filter((sale)=>sale.id !== id)
+
+      );
+
+
+    }catch(error){
+
+      console.error(error);
+
+      alert("Error de conexión");
+
+    }
 
 
   }
