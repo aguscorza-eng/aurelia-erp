@@ -147,8 +147,8 @@ function generateSku(text:string){
   return text
     .normalize("NFD")
     .replace(/[̀-ͯ]/g,"")
-    .toUpperCase()
-    .replace(/[^A-Z0-9]+/g,"-")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g,"-")
     .replace(/^-+|-+$/g,"")
     .slice(0,24);
 }
