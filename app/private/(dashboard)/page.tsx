@@ -385,11 +385,11 @@ return (
 
 
 const CARD_ACCENTS:Record<string,{ card:string; circle:string }> = {
- green:   { card:"bg-emerald-50 border-emerald-100", circle:"bg-emerald-100 text-emerald-700" },
- amber:   { card:"bg-amber-50 border-amber-100",     circle:"bg-amber-100 text-amber-700" },
- blue:    { card:"bg-blue-50 border-blue-100",       circle:"bg-blue-100 text-blue-700" },
- red:     { card:"bg-red-50 border-red-100",         circle:"bg-red-100 text-red-700" },
- neutral: { card:"bg-white border-stone-100",        circle:"bg-[#F8F2E9] text-[#B08D57]" }
+ green:   { card:"bg-emerald-50 border-emerald-100 hover:bg-emerald-100", circle:"bg-emerald-100 text-emerald-700" },
+ amber:   { card:"bg-amber-50 border-amber-100 hover:bg-amber-100",       circle:"bg-amber-100 text-amber-700" },
+ blue:    { card:"bg-blue-50 border-blue-100 hover:bg-blue-100",          circle:"bg-blue-100 text-blue-700" },
+ red:     { card:"bg-red-50 border-red-100 hover:bg-red-100",             circle:"bg-red-100 text-red-700" },
+ neutral: { card:"bg-white border-stone-100 hover:bg-stone-50",           circle:"bg-[#F8F2E9] text-[#B08D57]" }
 };
 
 
@@ -412,7 +412,7 @@ function Card({
 
 return (
 
-<div className={`rounded-3xl p-5 border flex justify-between items-center ${a.card}`}>
+<div className={`rounded-3xl p-5 border flex justify-between items-center transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 cursor-default ${a.card}`}>
 
 
 <div>
