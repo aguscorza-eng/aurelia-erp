@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { createSession, SESSION_MAX_AGE } from "@/lib/auth";
 
 
 export async function POST(req: Request) {
@@ -58,13 +59,9 @@ export async function POST(req: Request) {
 
 
     const validPassword = await bcrypt.compare(
-  password,
-  user.password
-);
-
-console.log("PASSWORD INGRESADA:", password);
-console.log("HASH DB:", user.password);
-console.log("RESULTADO:", validPassword);
+      password,
+      user.password
+    );
 
 
 
@@ -83,7 +80,12 @@ console.log("RESULTADO:", validPassword);
 
 
 
-    return NextResponse.json({
+    const token = await createSession({
+      id: user.id,
+      email: user.email
+    });
+
+    const res = NextResponse.json({
 
       success:true,
 
@@ -95,6 +97,16 @@ console.log("RESULTADO:", validPassword);
       }
 
     });
+
+    res.cookies.set("session", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: SESSION_MAX_AGE
+    });
+
+    return res;
 
 
 

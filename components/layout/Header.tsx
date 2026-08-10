@@ -32,7 +32,13 @@ export default function Header() {
 
 
 
-  function logout(){
+  async function logout(){
+
+    try{
+      await fetch("/api/logout", { method: "POST" });
+    }catch(error){
+      console.error(error);
+    }
 
     localStorage.removeItem("auth");
     localStorage.removeItem("user");
