@@ -10,7 +10,6 @@ import TopProductsCarousel from "@/components/dashboard/TopProductsCarousel";
 import {
   AlertTriangle,
   TrendingUp,
-  TrendingDown,
   Box,
   Clock,
   Receipt,
@@ -94,8 +93,6 @@ export default function Home(){
   const totalGlobal = dashboard.totalGlobal || 0;
 
   const salesCount = dashboard.salesCount || 0;
-
-  const gain = dashboard.profit || 0;
 
   const pendingBalance = dashboard.pendingBalance || 0;
 
@@ -195,26 +192,13 @@ export default function Home(){
 
 
 
-            <div className="grid grid-cols-5 gap-5 mt-4">
+            <div className="grid grid-cols-4 gap-5 mt-4">
 
 
               <Card
                 title="Ventas del mes"
                 value={money(totalSales)}
                 icon={<TrendingUp size={19}/>}
-              />
-
-
-              <Card
-                title="Ganancia"
-                value={money(gain)}
-                icon={
-                  gain >=0
-                  ?
-                  <TrendingUp size={19}/>
-                  :
-                  <TrendingDown size={19}/>
-                }
               />
 
 
