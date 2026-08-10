@@ -239,7 +239,7 @@ export default function CalculadoraPage(){
 
 
           {/* 2 x 2 */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
 
 
             {/* INSUMOS */}
