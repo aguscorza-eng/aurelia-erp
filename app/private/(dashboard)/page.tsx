@@ -91,6 +91,10 @@ export default function Home(){
 
   const totalSales = dashboard.salesMonth || 0;
 
+  const totalGlobal = dashboard.totalGlobal || 0;
+
+  const salesCount = dashboard.salesCount || 0;
+
   const gain = dashboard.profit || 0;
 
   const pendingBalance = dashboard.pendingBalance || 0;
@@ -156,6 +160,29 @@ export default function Home(){
             </div>
 
           )}
+
+
+
+          {/* BALANCE GLOBAL — suma de todas las ventas de todos los meses */}
+          <div className="bg-stone-900 text-white rounded-3xl px-7 py-6 flex items-center justify-between">
+
+            <div>
+              <p className="text-xs tracking-widest text-stone-400 uppercase mb-1">
+                Balance global de ventas
+              </p>
+              <h2 className="text-4xl font-bold">
+                {money(totalGlobal)}
+              </h2>
+              <p className="text-sm text-stone-400 mt-1">
+                {salesCount} ventas acumuladas — todos los meses
+              </p>
+            </div>
+
+            <div className="bg-white/10 rounded-full p-4">
+              <TrendingUp size={26}/>
+            </div>
+
+          </div>
 
 
 

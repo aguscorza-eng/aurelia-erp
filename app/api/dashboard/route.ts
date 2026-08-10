@@ -199,6 +199,15 @@ export async function GET() {
 
 
 
+    // Balance global: suma de TODAS las ventas cargadas (todos los meses).
+    const totalAgg = await prisma.sale.aggregate({
+      _sum: { total: true }
+    });
+    const totalGlobal = Number(totalAgg._sum.total || 0);
+    const salesCount = await prisma.sale.count();
+
+
+
     const criticalStock = await prisma.product.count({
 
       where:{
@@ -228,6 +237,10 @@ export async function GET() {
     return NextResponse.json({
 
       salesMonth,
+
+      totalGlobal,
+
+      salesCount,
 
       profit,
 
