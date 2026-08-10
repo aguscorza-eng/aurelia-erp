@@ -19,6 +19,8 @@ const [openModal,setOpenModal] = useState(false);
 
 const [editingId,setEditingId] = useState<string|null>(null);
 
+const [refreshKey,setRefreshKey] = useState(0);
+
 
 const [selectedBudget,setSelectedBudget] = useState<any>(null);
 
@@ -64,6 +66,8 @@ function closeModal(){
 setOpenModal(false);
 
 setEditingId(null);
+
+setRefreshKey((k)=>k+1);
 
 }
 
@@ -123,6 +127,8 @@ onNew={newBudget}
 onEdit={editBudget}
 
 onView={(budget)=>setSelectedBudget(budget)}
+
+refreshKey={refreshKey}
 
 />
 

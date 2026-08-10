@@ -183,6 +183,49 @@ price:Number(p.price)
 setProducts(terminados);
 
 
+    // Si estamos editando, cargamos los datos del presupuesto.
+    // Si es nuevo, limpiamos el formulario para no arrastrar datos viejos.
+    if(budgetId){
+
+      const allBudgets = JSON.parse(
+        localStorage.getItem("budgets") || "[]"
+      );
+
+      const current = allBudgets.find(
+        (x:any)=>String(x.id)===String(budgetId)
+      );
+
+      if(current){
+
+        const cli = clientsData.find(
+          (c:any)=>String(c.id)===String(current.client?.id)
+        ) || current.client || null;
+
+        setSelectedClient(cli);
+        setItems(current.items || []);
+        setDiscount(current.discount || 0);
+        setBonus(current.bonus || 0);
+        setPreparationDays(current.preparationDays || "");
+        setDeliveryDate(current.deliveryDate || "");
+        setCustomerNote(current.customerNote || "");
+
+      }
+
+    }else{
+
+      setSelectedClient(null);
+      setItems([]);
+      setProductId("");
+      setQuantity(1);
+      setDiscount(0);
+      setBonus(0);
+      setPreparationDays("");
+      setDeliveryDate("");
+      setCustomerNote("");
+
+    }
+
+
 
 }
 
@@ -434,22 +477,41 @@ new Date().toISOString()
 
 
 
-localStorage.setItem(
+if(budgetId){
 
-"budgets",
+// Editar: reemplazamos el presupuesto conservando número, fecha y estado.
+const updated = budgets.map((b:any)=>
 
-JSON.stringify([
+String(b.id) === String(budgetId)
 
-...budgets,
+? {
+    ...b,
+    client:budget.client,
+    items,
+    subtotal,
+    discount,
+    discountAmount,
+    bonus,
+    preparationDays,
+    deliveryDate,
+    customerNote,
+    total
+  }
 
-budget
-
-])
+: b
 
 );
 
+localStorage.setItem("budgets", JSON.stringify(updated));
 
+}else{
 
+localStorage.setItem(
+"budgets",
+JSON.stringify([...budgets, budget])
+);
+
+}
 
 
 onClose();
@@ -518,7 +580,7 @@ mb-6
 
 <h2 className="text-2xl font-bold">
 
-Nuevo presupuesto
+{budgetId ? "Editar presupuesto" : "Nuevo presupuesto"}
 
 </h2>
 
