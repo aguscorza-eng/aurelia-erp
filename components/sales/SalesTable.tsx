@@ -328,7 +328,9 @@ export default function SalesTable({
             <td>
 
 
-              {sale.products?.map((p:any,index:number)=>(
+              {sale.products && sale.products.length > 0 ? (
+
+                sale.products.map((p:any,index:number)=>(
 
 
                 <div key={index}>
@@ -351,7 +353,17 @@ export default function SalesTable({
                 </div>
 
 
-              ))}
+              ))
+
+              ) : (
+
+                <p className="text-sm text-stone-600">
+
+                  {sale.detail || "-"}
+
+                </p>
+
+              )}
 
 
             </td>

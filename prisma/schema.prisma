@@ -136,6 +136,7 @@ model Sale {
   advance     Decimal @default(0)
   balance     Decimal @default(0)
   paymentType String?
+  detail      String?
 
   dateIn  DateTime  @default(now())
   dateOut DateTime?
