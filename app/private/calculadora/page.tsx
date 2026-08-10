@@ -32,7 +32,6 @@ export default function CalculadoraPage(){
   const [multMin,setMultMin] = useState(4);
 
 
-  // Recetas guardadas
   const [recipes,setRecipes] = useState<any[]>([]);
   const [currentId,setCurrentId] = useState<string|null>(null);
   const [recipeName,setRecipeName] = useState("");
@@ -158,6 +157,9 @@ export default function CalculadoraPage(){
   }
 
 
+  const inputCls = "border rounded-lg px-2.5 py-1.5 text-sm";
+
+
   return (
 
     <main className="flex h-screen bg-[#F8F8F6]">
@@ -168,221 +170,224 @@ export default function CalculadoraPage(){
 
         <Header />
 
-        <div className="flex-1 overflow-y-auto p-10 space-y-8">
+        <div className="flex-1 overflow-y-auto p-6">
+
+          <div className="max-w-3xl space-y-4">
 
 
-          <div>
-            <h1 className="text-3xl font-bold">Calculadora de costos</h1>
-            <p className="text-stone-500">
-              Cargá los insumos y te dice el costo y el precio sugerido
-            </p>
-          </div>
-
-
-          {/* RECETAS GUARDADAS */}
-          <div className="bg-white border rounded-3xl p-5 flex flex-wrap gap-3 items-end">
-            <div className="flex-1 min-w-[200px]">
-              <label className="text-xs text-stone-500 block mb-1">Receta guardada</label>
-              <select
-                value={currentId || ""}
-                onChange={(e)=>cargarReceta(e.target.value)}
-                className="w-full border rounded-xl p-2.5"
-              >
-                <option value="">— Nueva receta —</option>
-                {recipes.map((r)=>(
-                  <option key={r.id} value={r.id}>{r.name}</option>
-                ))}
-              </select>
+            <div>
+              <h1 className="text-2xl font-bold">Calculadora de costos</h1>
+              <p className="text-sm text-stone-500">
+                Cargá los insumos y te dice el costo y el precio sugerido
+              </p>
             </div>
 
-            <div className="flex-1 min-w-[200px]">
-              <label className="text-xs text-stone-500 block mb-1">Nombre de la receta</label>
-              <input
-                value={recipeName}
-                onChange={(e)=>setRecipeName(e.target.value)}
-                placeholder="Ej: Caramelera con cera"
-                className="w-full border rounded-xl p-2.5"
-              />
-            </div>
 
-            <button
-              onClick={guardarReceta}
-              className="bg-stone-900 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2"
-            >
-              <Save size={16}/>
-              {currentId ? "Actualizar" : "Guardar"}
-            </button>
+            {/* RECETAS */}
+            <div className="bg-white border rounded-2xl p-4 flex flex-wrap gap-2 items-end">
+              <div className="flex-1 min-w-[160px]">
+                <label className="text-xs text-stone-500 block mb-1">Receta</label>
+                <select
+                  value={currentId || ""}
+                  onChange={(e)=>cargarReceta(e.target.value)}
+                  className={`${inputCls} w-full`}
+                >
+                  <option value="">— Nueva —</option>
+                  {recipes.map((r)=>(
+                    <option key={r.id} value={r.id}>{r.name}</option>
+                  ))}
+                </select>
+              </div>
 
-            {currentId && (
+              <div className="flex-1 min-w-[160px]">
+                <label className="text-xs text-stone-500 block mb-1">Nombre</label>
+                <input
+                  value={recipeName}
+                  onChange={(e)=>setRecipeName(e.target.value)}
+                  placeholder="Ej: Caramelera con cera"
+                  className={`${inputCls} w-full`}
+                />
+              </div>
+
               <button
-                onClick={eliminarReceta}
-                className="border border-red-200 text-red-600 px-4 py-2.5 rounded-xl"
+                onClick={guardarReceta}
+                className="bg-stone-900 text-white px-4 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1.5"
               >
-                Eliminar
+                <Save size={15}/>
+                {currentId ? "Actualizar" : "Guardar"}
               </button>
-            )}
 
-            <button
-              onClick={nuevaReceta}
-              className="border px-4 py-2.5 rounded-xl"
-            >
-              Nueva
-            </button>
-          </div>
+              {currentId && (
+                <button
+                  onClick={eliminarReceta}
+                  className="border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-sm"
+                >
+                  Eliminar
+                </button>
+              )}
 
-
-          {/* INSUMOS */}
-          <div className="bg-white border rounded-3xl p-7">
-
-            <h2 className="text-lg font-bold mb-1">Insumos (materia prima)</h2>
-            <p className="text-sm text-stone-400 mb-4">
-              Cantidad en gramos y precio por kilo o litro
-            </p>
-
-            <div className="hidden md:grid grid-cols-[1fr_120px_150px_120px_40px] gap-3 text-xs text-stone-400 px-1 mb-1">
-              <span>Insumo</span>
-              <span>Cantidad (g)</span>
-              <span>Precio x kg/L</span>
-              <span className="text-right">Costo</span>
-              <span></span>
+              <button
+                onClick={nuevaReceta}
+                className="border px-3 py-1.5 rounded-lg text-sm"
+              >
+                Nueva
+              </button>
             </div>
 
-            <div className="space-y-2">
-              {insumos.map((it,index)=>(
-                <div key={index} className="grid grid-cols-2 md:grid-cols-[1fr_120px_150px_120px_40px] gap-3 items-center">
-                  <input
-                    value={it.name}
-                    onChange={(e)=>updateInsumo(index,"name",e.target.value)}
-                    placeholder="Nombre"
-                    className="border rounded-xl p-2.5"
-                  />
+
+            {/* INSUMOS */}
+            <div className="bg-white border rounded-2xl p-4">
+
+              <div className="flex items-baseline justify-between mb-2">
+                <h2 className="font-bold">Insumos (materia prima)</h2>
+                <span className="text-xs text-stone-400">gramos + precio x kg/L</span>
+              </div>
+
+              <div className="hidden sm:grid grid-cols-[1fr_80px_110px_80px_28px] gap-2 text-[11px] text-stone-400 px-1 mb-1">
+                <span>Insumo</span>
+                <span>Cant. (g)</span>
+                <span>Precio kg/L</span>
+                <span className="text-right">Costo</span>
+                <span></span>
+              </div>
+
+              <div className="space-y-1.5">
+                {insumos.map((it,index)=>(
+                  <div key={index} className="grid grid-cols-2 sm:grid-cols-[1fr_80px_110px_80px_28px] gap-2 items-center">
+                    <input
+                      value={it.name}
+                      onChange={(e)=>updateInsumo(index,"name",e.target.value)}
+                      placeholder="Nombre"
+                      className={inputCls}
+                    />
+                    <input
+                      type="number"
+                      value={it.grams}
+                      onChange={(e)=>updateInsumo(index,"grams",e.target.value)}
+                      className={inputCls}
+                    />
+                    <input
+                      type="number"
+                      value={it.pricePerKg}
+                      onChange={(e)=>updateInsumo(index,"pricePerKg",e.target.value)}
+                      className={inputCls}
+                    />
+                    <span className="font-semibold text-sm text-right">{money(insumoCost(it))}</span>
+                    <button
+                      onClick={()=>setInsumos((prev)=>prev.filter((_,i)=>i!==index))}
+                      className="text-red-500 flex justify-center"
+                    >
+                      <Trash2 size={15}/>
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                onClick={()=>setInsumos((prev)=>[...prev,{ name:"", grams:0, pricePerKg:0 }])}
+                className="mt-3 text-sm font-medium text-[#B08D57] flex items-center gap-1 hover:underline"
+              >
+                <Plus size={15}/> Agregar insumo
+              </button>
+
+            </div>
+
+
+            {/* OTROS COSTOS */}
+            <div className="bg-white border rounded-2xl p-4">
+
+              <div className="flex items-baseline justify-between mb-2">
+                <h2 className="font-bold">Otros costos</h2>
+                <span className="text-xs text-stone-400">envase, packaging, mano de obra</span>
+              </div>
+
+              <div className="space-y-1.5">
+                {otros.map((it,index)=>(
+                  <div key={index} className="grid grid-cols-[1fr_110px_28px] gap-2 items-center">
+                    <input
+                      value={it.name}
+                      onChange={(e)=>updateOtro(index,"name",e.target.value)}
+                      placeholder="Nombre"
+                      className={inputCls}
+                    />
+                    <input
+                      type="number"
+                      value={it.price}
+                      onChange={(e)=>updateOtro(index,"price",e.target.value)}
+                      placeholder="Precio"
+                      className={inputCls}
+                    />
+                    <button
+                      onClick={()=>setOtros((prev)=>prev.filter((_,i)=>i!==index))}
+                      className="text-red-500 flex justify-center"
+                    >
+                      <Trash2 size={15}/>
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                onClick={()=>setOtros((prev)=>[...prev,{ name:"", price:0 }])}
+                className="mt-3 text-sm font-medium text-[#B08D57] flex items-center gap-1 hover:underline"
+              >
+                <Plus size={15}/> Agregar costo
+              </button>
+
+            </div>
+
+
+            {/* MULTIPLICADORES + RESULTADO EN UNA FILA */}
+            <div className="bg-white border rounded-2xl p-4">
+              <div className="flex flex-wrap items-center gap-4">
+                <div>
+                  <label className="text-xs text-stone-500 block mb-1">Mayorista (× costo)</label>
                   <input
                     type="number"
-                    value={it.grams}
-                    onChange={(e)=>updateInsumo(index,"grams",e.target.value)}
-                    className="border rounded-xl p-2.5"
+                    step="0.1"
+                    value={multMay}
+                    onChange={(e)=>setMultMay(Number(e.target.value))}
+                    className={`${inputCls} w-24`}
                   />
-                  <input
-                    type="number"
-                    value={it.pricePerKg}
-                    onChange={(e)=>updateInsumo(index,"pricePerKg",e.target.value)}
-                    className="border rounded-xl p-2.5"
-                  />
-                  <span className="font-semibold text-right">{money(insumoCost(it))}</span>
-                  <button
-                    onClick={()=>setInsumos((prev)=>prev.filter((_,i)=>i!==index))}
-                    className="text-red-500 flex justify-center"
-                  >
-                    <Trash2 size={16}/>
-                  </button>
                 </div>
-              ))}
-            </div>
-
-            <button
-              onClick={()=>setInsumos((prev)=>[...prev,{ name:"", grams:0, pricePerKg:0 }])}
-              className="mt-4 text-sm font-medium text-[#B08D57] flex items-center gap-1 hover:underline"
-            >
-              <Plus size={16}/> Agregar insumo
-            </button>
-
-          </div>
-
-
-          {/* OTROS COSTOS */}
-          <div className="bg-white border rounded-3xl p-7">
-
-            <h2 className="text-lg font-bold mb-1">Otros costos</h2>
-            <p className="text-sm text-stone-400 mb-4">
-              Envase, packaging, mano de obra, etc. (precio directo)
-            </p>
-
-            <div className="space-y-2">
-              {otros.map((it,index)=>(
-                <div key={index} className="grid grid-cols-[1fr_150px_40px] gap-3 items-center">
-                  <input
-                    value={it.name}
-                    onChange={(e)=>updateOtro(index,"name",e.target.value)}
-                    placeholder="Nombre"
-                    className="border rounded-xl p-2.5"
-                  />
+                <div>
+                  <label className="text-xs text-stone-500 block mb-1">Minorista (× costo)</label>
                   <input
                     type="number"
-                    value={it.price}
-                    onChange={(e)=>updateOtro(index,"price",e.target.value)}
-                    placeholder="Precio"
-                    className="border rounded-xl p-2.5"
+                    step="0.1"
+                    value={multMin}
+                    onChange={(e)=>setMultMin(Number(e.target.value))}
+                    className={`${inputCls} w-24`}
                   />
-                  <button
-                    onClick={()=>setOtros((prev)=>prev.filter((_,i)=>i!==index))}
-                    className="text-red-500 flex justify-center"
-                  >
-                    <Trash2 size={16}/>
-                  </button>
                 </div>
-              ))}
-            </div>
-
-            <button
-              onClick={()=>setOtros((prev)=>[...prev,{ name:"", price:0 }])}
-              className="mt-4 text-sm font-medium text-[#B08D57] flex items-center gap-1 hover:underline"
-            >
-              <Plus size={16}/> Agregar costo
-            </button>
-
-          </div>
-
-
-          {/* MULTIPLICADORES */}
-          <div className="bg-white border rounded-3xl p-7">
-            <h2 className="text-lg font-bold mb-4">Multiplicadores de precio</h2>
-            <div className="grid grid-cols-2 gap-6 max-w-md">
-              <div>
-                <label className="text-sm text-stone-500 block mb-1">Mayorista (× costo)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={multMay}
-                  onChange={(e)=>setMultMay(Number(e.target.value))}
-                  className="w-full border rounded-xl p-2.5"
-                />
-              </div>
-              <div>
-                <label className="text-sm text-stone-500 block mb-1">Minorista (× costo)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={multMin}
-                  onChange={(e)=>setMultMin(Number(e.target.value))}
-                  className="w-full border rounded-xl p-2.5"
-                />
               </div>
             </div>
-          </div>
 
 
-          {/* RESULTADO */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {/* RESULTADO */}
+            <div className="grid grid-cols-3 gap-3">
 
-            <div className="bg-white border rounded-3xl p-6">
-              <div className="flex items-center gap-2 text-stone-500 text-sm">
-                <Calculator size={16}/> Costo total
+              <div className="bg-white border rounded-2xl p-4">
+                <div className="flex items-center gap-1.5 text-stone-500 text-xs">
+                  <Calculator size={14}/> Costo total
+                </div>
+                <h2 className="text-2xl font-bold mt-1">{money(costoTotal)}</h2>
               </div>
-              <h2 className="text-3xl font-bold mt-2">{money(costoTotal)}</h2>
+
+              <div className="bg-[#F8F2E9] border rounded-2xl p-4">
+                <p className="text-xs text-stone-500">Mayorista (×{multMay})</p>
+                <h2 className="text-2xl font-bold mt-1 text-[#B08D57]">{money(precioMay)}</h2>
+              </div>
+
+              <div className="bg-stone-900 text-white rounded-2xl p-4">
+                <p className="text-xs text-stone-400">Minorista (×{multMin})</p>
+                <h2 className="text-2xl font-bold mt-1">{money(precioMin)}</h2>
+              </div>
+
             </div>
 
-            <div className="bg-[#F8F2E9] border rounded-3xl p-6">
-              <p className="text-sm text-stone-500">Precio mayorista (×{multMay})</p>
-              <h2 className="text-3xl font-bold mt-2 text-[#B08D57]">{money(precioMay)}</h2>
-            </div>
-
-            <div className="bg-stone-900 text-white rounded-3xl p-6">
-              <p className="text-sm text-stone-400">Precio minorista (×{multMin})</p>
-              <h2 className="text-3xl font-bold mt-2">{money(precioMin)}</h2>
-            </div>
 
           </div>
-
 
         </div>
 
