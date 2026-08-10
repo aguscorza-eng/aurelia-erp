@@ -16,6 +16,7 @@ import {
   Settings,
   FileText,
   DollarSign,
+  Calculator,
 } from "lucide-react";
 
 
@@ -39,6 +40,13 @@ const menu = [
         icon: Package,
         label: "Productos",
         href: "/private/productos",
+      },
+
+
+      {
+        icon: Calculator,
+        label: "Calculadora",
+        href: "/private/calculadora",
       },
 
 
