@@ -189,6 +189,52 @@ setType("PRODUCTO_TERMINADO");
 
 
 
+// Achica la imagen a máx 600px y la guarda como data URL (base64).
+function handleImageFile(file:File){
+
+  const reader = new FileReader();
+
+  reader.onload = (e)=>{
+
+    const img = document.createElement("img");
+
+    img.onload = ()=>{
+
+      const maxDim = 600;
+      let width = img.width;
+      let height = img.height;
+
+      if(width > height && width > maxDim){
+        height = Math.round(height * maxDim / width);
+        width = maxDim;
+      } else if(height > maxDim){
+        width = Math.round(width * maxDim / height);
+        height = maxDim;
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext("2d");
+      if(ctx){
+        ctx.drawImage(img, 0, 0, width, height);
+        setImage(canvas.toDataURL("image/jpeg", 0.75));
+      }
+
+    };
+
+    img.src = e.target?.result as string;
+
+  };
+
+  reader.readAsDataURL(file);
+
+}
+
+
+
+
 async function saveProduct(){
 
 
@@ -559,6 +605,51 @@ className="border rounded-xl h-12 px-4"
 
 
 
+
+
+
+{/* FOTO DEL PRODUCTO */}
+<div className="mt-5">
+
+<label className="text-sm text-stone-500 block mb-2">
+Foto del producto
+</label>
+
+{image ? (
+
+<div className="flex items-center gap-4">
+<img
+src={image}
+alt="Producto"
+className="w-24 h-24 object-cover rounded-xl border"
+/>
+<button
+type="button"
+onClick={()=>setImage("")}
+className="text-red-600 text-sm"
+>
+Quitar foto
+</button>
+</div>
+
+) : (
+
+<label className="border border-dashed rounded-xl h-24 flex items-center justify-center cursor-pointer text-stone-400 hover:bg-stone-50">
++ Subir foto
+<input
+type="file"
+accept="image/*"
+className="hidden"
+onChange={(e)=>{
+const f = e.target.files?.[0];
+if(f) handleImageFile(f);
+}}
+/>
+</label>
+
+)}
+
+</div>
 
 
 
