@@ -162,7 +162,7 @@ export default function CalculadoraPage(){
   }
 
 
-  const inputCls = "border rounded-lg px-2.5 py-1.5 text-sm";
+  const inputCls = "border rounded-xl px-3 py-2 text-sm";
 
 
   return (
@@ -175,90 +175,90 @@ export default function CalculadoraPage(){
 
         <Header />
 
-        <div className="flex-1 overflow-y-auto p-6">
-
-          <div className="max-w-3xl space-y-4">
+        <div className="flex-1 overflow-y-auto p-8 space-y-5">
 
 
-            <div>
-              <h1 className="text-2xl font-bold">Calculadora de costos</h1>
-              <p className="text-sm text-stone-500">
-                Cargá los insumos y te dice el costo y el precio sugerido
-              </p>
+          <div>
+            <h1 className="text-3xl font-bold">Calculadora de costos</h1>
+            <p className="text-stone-500">
+              Cargá los insumos y te dice el costo y el precio sugerido
+            </p>
+          </div>
+
+
+          {/* RECETAS (fila completa) */}
+          <div className="bg-white border rounded-2xl p-5 flex flex-wrap gap-3 items-end">
+            <div className="flex-1 min-w-[200px]">
+              <label className="text-xs text-stone-500 block mb-1">Receta guardada</label>
+              <select
+                value={currentId || ""}
+                onChange={(e)=>cargarReceta(e.target.value)}
+                className={`${inputCls} w-full`}
+              >
+                <option value="">— Nueva receta —</option>
+                {recipes.map((r)=>(
+                  <option key={r.id} value={r.id}>{r.name}</option>
+                ))}
+              </select>
             </div>
 
-
-            {/* RECETAS */}
-            <div className="bg-white border rounded-2xl p-4 flex flex-wrap gap-2 items-end">
-              <div className="flex-1 min-w-[160px]">
-                <label className="text-xs text-stone-500 block mb-1">Receta</label>
-                <select
-                  value={currentId || ""}
-                  onChange={(e)=>cargarReceta(e.target.value)}
-                  className={`${inputCls} w-full`}
-                >
-                  <option value="">— Nueva —</option>
-                  {recipes.map((r)=>(
-                    <option key={r.id} value={r.id}>{r.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex-1 min-w-[160px]">
-                <label className="text-xs text-stone-500 block mb-1">Nombre</label>
-                <input
-                  value={recipeName}
-                  onChange={(e)=>setRecipeName(e.target.value)}
-                  placeholder="Ej: Caramelera con cera"
-                  className={`${inputCls} w-full`}
-                />
-              </div>
-
-              <button
-                onClick={guardarReceta}
-                className="bg-stone-900 text-white px-4 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1.5"
-              >
-                <Save size={15}/>
-                {currentId ? "Actualizar" : "Guardar"}
-              </button>
-
-              {currentId && (
-                <button
-                  onClick={eliminarReceta}
-                  className="border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-sm"
-                >
-                  Eliminar
-                </button>
-              )}
-
-              <button
-                onClick={nuevaReceta}
-                className="border px-3 py-1.5 rounded-lg text-sm"
-              >
-                Nueva
-              </button>
+            <div className="flex-1 min-w-[200px]">
+              <label className="text-xs text-stone-500 block mb-1">Nombre</label>
+              <input
+                value={recipeName}
+                onChange={(e)=>setRecipeName(e.target.value)}
+                placeholder="Ej: Caramelera con cera"
+                className={`${inputCls} w-full`}
+              />
             </div>
+
+            <button
+              onClick={guardarReceta}
+              className="bg-stone-900 text-white px-5 py-2 rounded-xl text-sm font-medium flex items-center gap-2"
+            >
+              <Save size={16}/>
+              {currentId ? "Actualizar" : "Guardar"}
+            </button>
+
+            {currentId && (
+              <button
+                onClick={eliminarReceta}
+                className="border border-red-200 text-red-600 px-4 py-2 rounded-xl text-sm"
+              >
+                Eliminar
+              </button>
+            )}
+
+            <button
+              onClick={nuevaReceta}
+              className="border px-4 py-2 rounded-xl text-sm"
+            >
+              Nueva
+            </button>
+          </div>
+
+
+          {/* 2 x 2 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
 
 
             {/* INSUMOS */}
-            <div className="bg-white border rounded-2xl p-4">
+            <div className="bg-white border rounded-2xl p-6">
 
-              <div className="flex items-baseline justify-between mb-2">
-                <h2 className="font-bold">Insumos (materia prima)</h2>
-                <span className="text-xs text-stone-400">gramos + precio x kg/L</span>
-              </div>
+              <h2 className="text-lg font-bold mb-1">Insumos (materia prima)</h2>
+              <p className="text-sm text-stone-400 mb-4">Gramos y precio por kilo/litro</p>
 
-              <div className="hidden sm:grid grid-cols-[1fr_80px_110px_80px_28px] gap-2 text-[11px] text-stone-400 px-1 mb-1">
+              <div className="hidden sm:grid grid-cols-[1fr_70px_110px_80px_30px] gap-2 text-xs text-stone-400 px-1 mb-1">
                 <span>Insumo</span>
-                <span>Cant. (g)</span>
+                <span>Cant.(g)</span>
                 <span>Precio kg/L</span>
                 <span className="text-right">Costo</span>
                 <span></span>
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {insumos.map((it,index)=>(
-                  <div key={index} className="grid grid-cols-2 sm:grid-cols-[1fr_80px_110px_80px_28px] gap-2 items-center">
+                  <div key={index} className="grid grid-cols-2 sm:grid-cols-[1fr_70px_110px_80px_30px] gap-2 items-center">
                     <input
                       value={it.name}
                       onChange={(e)=>updateInsumo(index,"name",e.target.value)}
@@ -282,7 +282,7 @@ export default function CalculadoraPage(){
                       onClick={()=>setInsumos((prev)=>prev.filter((_,i)=>i!==index))}
                       className="text-red-500 flex justify-center"
                     >
-                      <Trash2 size={15}/>
+                      <Trash2 size={16}/>
                     </button>
                   </div>
                 ))}
@@ -290,25 +290,23 @@ export default function CalculadoraPage(){
 
               <button
                 onClick={()=>setInsumos((prev)=>[...prev,{ name:"", grams:0, pricePerKg:0 }])}
-                className="mt-3 text-sm font-medium text-[#B08D57] flex items-center gap-1 hover:underline"
+                className="mt-4 text-sm font-medium text-[#B08D57] flex items-center gap-1 hover:underline"
               >
-                <Plus size={15}/> Agregar insumo
+                <Plus size={16}/> Agregar insumo
               </button>
 
             </div>
 
 
             {/* OTROS COSTOS */}
-            <div className="bg-white border rounded-2xl p-4">
+            <div className="bg-white border rounded-2xl p-6">
 
-              <div className="flex items-baseline justify-between mb-2">
-                <h2 className="font-bold">Otros costos</h2>
-                <span className="text-xs text-stone-400">envase, packaging, mano de obra</span>
-              </div>
+              <h2 className="text-lg font-bold mb-1">Otros costos</h2>
+              <p className="text-sm text-stone-400 mb-4">Envase, packaging, mano de obra…</p>
 
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {otros.map((it,index)=>(
-                  <div key={index} className="grid grid-cols-[1fr_110px_28px] gap-2 items-center">
+                  <div key={index} className="grid grid-cols-[1fr_120px_30px] gap-2 items-center">
                     <input
                       value={it.name}
                       onChange={(e)=>updateOtro(index,"name",e.target.value)}
@@ -326,7 +324,7 @@ export default function CalculadoraPage(){
                       onClick={()=>setOtros((prev)=>prev.filter((_,i)=>i!==index))}
                       className="text-red-500 flex justify-center"
                     >
-                      <Trash2 size={15}/>
+                      <Trash2 size={16}/>
                     </button>
                   </div>
                 ))}
@@ -334,80 +332,92 @@ export default function CalculadoraPage(){
 
               <button
                 onClick={()=>setOtros((prev)=>[...prev,{ name:"", price:0 }])}
-                className="mt-3 text-sm font-medium text-[#B08D57] flex items-center gap-1 hover:underline"
+                className="mt-4 text-sm font-medium text-[#B08D57] flex items-center gap-1 hover:underline"
               >
-                <Plus size={15}/> Agregar costo
+                <Plus size={16}/> Agregar costo
               </button>
 
             </div>
 
 
-            {/* MULTIPLICADORES + RESULTADO EN UNA FILA */}
-            <div className="bg-white border rounded-2xl p-4">
-              <div className="flex flex-wrap items-center gap-4">
+            {/* PRECIOS (rinde + multiplicadores) */}
+            <div className="bg-white border rounded-2xl p-6">
+
+              <h2 className="text-lg font-bold mb-4">Precios</h2>
+
+              <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="text-xs text-stone-500 block mb-1">Rinde (unidades)</label>
+                  <label className="text-xs text-stone-500 block mb-1">Rinde (u.)</label>
                   <input
                     type="number"
                     min="1"
                     value={rinde}
                     onChange={(e)=>setRinde(Number(e.target.value))}
-                    className={`${inputCls} w-24`}
+                    className={`${inputCls} w-full`}
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-stone-500 block mb-1">Mayorista (× costo)</label>
+                  <label className="text-xs text-stone-500 block mb-1">Mayorista ×</label>
                   <input
                     type="number"
                     step="0.1"
                     value={multMay}
                     onChange={(e)=>setMultMay(Number(e.target.value))}
-                    className={`${inputCls} w-24`}
+                    className={`${inputCls} w-full`}
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-stone-500 block mb-1">Minorista (× costo)</label>
+                  <label className="text-xs text-stone-500 block mb-1">Minorista ×</label>
                   <input
                     type="number"
                     step="0.1"
                     value={multMin}
                     onChange={(e)=>setMultMin(Number(e.target.value))}
-                    className={`${inputCls} w-24`}
+                    className={`${inputCls} w-full`}
                   />
                 </div>
               </div>
+
+              <p className="text-xs text-stone-400 mt-4 leading-relaxed">
+                <strong>Rinde:</strong> cuántas unidades salen de la receta (ej. 200g de glicerina = varios jabones). Poné 1 si es por unidad.
+              </p>
+
             </div>
 
 
             {/* RESULTADO */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="bg-white border rounded-2xl p-6">
 
-              <div className="bg-white border rounded-2xl p-4">
-                <div className="flex items-center gap-1.5 text-stone-500 text-xs">
-                  <Calculator size={14}/> Costo x unidad
+              <h2 className="text-lg font-bold mb-4">Resultado</h2>
+
+              <div className="bg-stone-50 rounded-2xl p-4 mb-3">
+                <div className="flex items-center gap-2 text-stone-500 text-sm">
+                  <Calculator size={16}/> Costo por unidad
                 </div>
-                <h2 className="text-2xl font-bold mt-1">{money(costoUnidad)}</h2>
+                <h2 className="text-3xl font-bold mt-1">{money(costoUnidad)}</h2>
                 {Number(rinde) > 1 && (
-                  <p className="text-[11px] text-stone-400 mt-1">
-                    Lote: {money(costoTotal)} ({rinde} u.)
+                  <p className="text-xs text-stone-400 mt-1">
+                    Lote completo: {money(costoTotal)} · {rinde} unidades
                   </p>
                 )}
               </div>
 
-              <div className="bg-[#F8F2E9] border rounded-2xl p-4">
-                <p className="text-xs text-stone-500">Mayorista (×{multMay})</p>
-                <h2 className="text-2xl font-bold mt-1 text-[#B08D57]">{money(precioMay)}</h2>
-              </div>
-
-              <div className="bg-stone-900 text-white rounded-2xl p-4">
-                <p className="text-xs text-stone-400">Minorista (×{multMin})</p>
-                <h2 className="text-2xl font-bold mt-1">{money(precioMin)}</h2>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-[#F8F2E9] rounded-2xl p-4">
+                  <p className="text-xs text-stone-500">Mayorista (×{multMay})</p>
+                  <h3 className="text-2xl font-bold mt-1 text-[#B08D57]">{money(precioMay)}</h3>
+                </div>
+                <div className="bg-stone-900 text-white rounded-2xl p-4">
+                  <p className="text-xs text-stone-400">Minorista (×{multMin})</p>
+                  <h3 className="text-2xl font-bold mt-1">{money(precioMin)}</h3>
+                </div>
               </div>
 
             </div>
 
 
           </div>
+
 
         </div>
 
