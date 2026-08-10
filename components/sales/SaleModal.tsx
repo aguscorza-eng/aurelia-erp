@@ -355,14 +355,6 @@ useEffect(()=>{
 
 
 
-  if(!open) return null;
-
-
-
-
-
-
-
   const clientBoxRef = useRef<HTMLDivElement>(null);
 
   // Cierra la lista de clientes al hacer click fuera del buscador.
@@ -375,6 +367,14 @@ useEffect(()=>{
     document.addEventListener("mousedown", handleClickOutside);
     return ()=>document.removeEventListener("mousedown", handleClickOutside);
   },[]);
+
+
+  if(!open) return null;
+
+
+
+
+
 
 
   const filteredClients = clients.filter((item)=>
