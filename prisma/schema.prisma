@@ -82,10 +82,11 @@ model Purchase {
 model PurchaseItem {
   id         String   @id @default(cuid())
   purchaseId String
-  productId  String
+  productId  String?
+  name       String?
   quantity   Int
   cost       Decimal
-  product    Product  @relation(fields: [productId], references: [id])
+  product    Product?  @relation(fields: [productId], references: [id])
   purchase   Purchase @relation(fields: [purchaseId], references: [id])
 }
 

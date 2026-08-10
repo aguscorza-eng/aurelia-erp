@@ -177,7 +177,7 @@ export default function PurchasesTable({
                   <tr className="text-left text-sm text-stone-500">
                     <th className="px-6 py-4">Fecha</th>
                     <th>Proveedor</th>
-                    <th>Productos</th>
+                    <th>Insumos</th>
                     <th>Total</th>
                     <th>Estado</th>
                     <th>Acciones</th>
@@ -202,7 +202,7 @@ export default function PurchasesTable({
                       </td>
 
                       <td>
-                        {purchase.items.length} productos
+                        {purchase.items.length} insumos
                       </td>
 
                       <td className="font-semibold">
