@@ -121,7 +121,10 @@ height="100%"
 >
 
 
-<LineChart data={data}>
+<LineChart
+data={data}
+margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+>
 
 
 <CartesianGrid
@@ -132,10 +135,25 @@ strokeDasharray="3 3"
 <XAxis dataKey="name"/>
 
 
-<YAxis/>
+<YAxis
+width={55}
+tick={{ fontSize: 12 }}
+tickFormatter={(v:number)=>
+v >= 1000000
+? `$${(v/1000000).toFixed(1).replace(/\.0$/,"")}M`
+: v >= 1000
+? `$${Math.round(v/1000)}k`
+: `$${v}`
+}
+/>
 
 
-<Tooltip/>
+<Tooltip
+formatter={(value:any)=>[
+`$${Number(value).toLocaleString("es-AR")}`,
+"Ventas"
+]}
+/>
 
 
 
