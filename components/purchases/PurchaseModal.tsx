@@ -183,13 +183,13 @@ export default function PurchaseModal({
         </select>
 
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-3">
 
           <input
             value={insumo}
             onChange={(e)=>setInsumo(e.target.value)}
             placeholder="Insumo (ej: Cera de soja)"
-            className="border rounded-xl p-3"
+            className="border rounded-xl p-3 col-span-2"
           />
 
           <input
