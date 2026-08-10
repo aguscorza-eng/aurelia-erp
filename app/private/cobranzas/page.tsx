@@ -12,6 +12,21 @@ const money = (n:number)=>
   `$${Number(n || 0).toLocaleString("es-AR",{ maximumFractionDigits:0 })}`;
 
 
+// Días transcurridos desde la fecha de la venta.
+function diasDeuda(dateStr:string){
+  if(!dateStr) return 0;
+  const diff = Date.now() - new Date(dateStr).getTime();
+  return Math.max(0, Math.floor(diff / (1000*60*60*24)));
+}
+
+
+function diasColor(dias:number){
+  if(dias > 30) return "text-red-600";
+  if(dias > 7) return "text-amber-600";
+  return "text-stone-500";
+}
+
+
 export default function CobranzasPage(){
 
   const [sales,setSales] = useState<any[]>([]);
@@ -161,6 +176,7 @@ export default function CobranzasPage(){
                     <th>Total</th>
                     <th>Anticipo</th>
                     <th>Saldo</th>
+                    <th>Días de deuda</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -198,6 +214,12 @@ export default function CobranzasPage(){
 
                       <td className="font-bold text-red-600">
                         {money(sale.balance)}
+                      </td>
+
+                      <td>
+                        <span className={`text-sm font-medium ${diasColor(diasDeuda(sale.createdAt))}`}>
+                          {diasDeuda(sale.createdAt)} días
+                        </span>
                       </td>
 
                       <td>
