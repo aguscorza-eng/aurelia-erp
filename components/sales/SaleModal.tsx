@@ -859,7 +859,7 @@ useEffect(()=>{
 
 
         {/* MÉTODO DE PAGO — botones visibles */}
-        <div>
+        <div className="pt-4 border-t border-stone-200">
           <p className="text-xs font-medium text-stone-500 mb-2">
             Método de pago
           </p>
@@ -886,7 +886,7 @@ useEffect(()=>{
 
 
         {/* ESTADO DEL PEDIDO — botones visibles */}
-        <div>
+        <div className="pt-4 border-t border-stone-200">
           <p className="text-xs font-medium text-stone-500 mb-2">
             Estado del pedido
           </p>
