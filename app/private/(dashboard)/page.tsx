@@ -161,21 +161,21 @@ export default function Home(){
 
 
           {/* BALANCE GLOBAL — suma de todas las ventas de todos los meses */}
-          <div className="bg-stone-900 text-white rounded-3xl px-7 py-6 flex items-center justify-between">
+          <div className="bg-white border border-stone-100 rounded-3xl px-7 py-6 flex items-center justify-between shadow-sm shadow-stone-200/40">
 
             <div>
-              <p className="text-xs tracking-widest text-stone-400 uppercase mb-1">
+              <p className="text-xs tracking-widest text-[#B08D57] font-medium uppercase mb-1">
                 Balance global de ventas
               </p>
-              <h2 className="text-4xl font-bold">
+              <h2 className="text-4xl font-bold text-stone-900">
                 {money(totalGlobal)}
               </h2>
-              <p className="text-sm text-stone-400 mt-1">
+              <p className="text-sm text-stone-500 mt-1">
                 {salesCount} ventas acumuladas — todos los meses
               </p>
             </div>
 
-            <div className="bg-white/10 rounded-full p-4">
+            <div className="bg-[#F8F2E9] text-[#B08D57] rounded-full p-4">
               <TrendingUp size={26}/>
             </div>
 
