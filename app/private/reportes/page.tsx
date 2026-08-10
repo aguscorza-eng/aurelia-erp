@@ -47,28 +47,22 @@ const [purchases,setPurchases]=useState<any[]>([]);
 
 useEffect(()=>{
 
+async function load(){
+try{
+const [sRes,pRes] = await Promise.all([
+fetch("/api/sales"),
+fetch("/api/purchases")
+]);
+const sData = await sRes.json();
+const pData = await pRes.json();
+setSales(sData.data || []);
+setPurchases(pData.data || []);
+}catch(error){
+console.error(error);
+}
+}
 
-const salesData = JSON.parse(
-
-localStorage.getItem("sales") || "[]"
-
-);
-
-
-
-const purchasesData = JSON.parse(
-
-localStorage.getItem("purchases") || "[]"
-
-);
-
-
-
-setSales(salesData);
-
-setPurchases(purchasesData);
-
-
+load();
 
 },[]);
 
@@ -217,6 +211,10 @@ month={month}
 
 year={year}
 
+sales={sales}
+
+purchases={purchases}
+
 />
 
 
@@ -243,6 +241,8 @@ month={month}
 
 year={year}
 
+sales={sales}
+
 />
 
 
@@ -254,6 +254,8 @@ year={year}
 month={month}
 
 year={year}
+
+purchases={purchases}
 
 />
 
