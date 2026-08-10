@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Pencil, Printer } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 
 type Purchase = {
@@ -15,7 +17,7 @@ type Purchase = {
 
 
 interface Props {
-  onEdit:(id:string)=>void;
+  onEdit:(purchase:any)=>void;
 }
 
 
@@ -69,6 +71,58 @@ export default function PurchasesTable({
       console.error(error);
       alert("Error de conexión");
     }
+
+  }
+
+
+  function printPurchase(purchase:any){
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(22);
+    doc.text("Aurelia", 14, 20);
+
+    doc.setFontSize(10);
+    doc.setTextColor(120);
+    doc.text("COMPRA DE MATERIA PRIMA", 14, 27);
+
+    doc.setTextColor(120);
+    doc.text(
+      `Fecha: ${new Date(purchase.createdAt).toLocaleDateString("es-AR")}`,
+      150, 20
+    );
+
+    doc.setTextColor(0);
+    doc.setFontSize(12);
+    doc.text(`Proveedor: ${purchase.supplier?.name || "-"}`, 14, 40);
+
+    autoTable(doc,{
+      startY: 48,
+      head: [["Insumo","Cantidad","Costo","Subtotal"]],
+      body: (purchase.items || []).map((it:any)=>[
+        it.name || it.product?.name || "-",
+        String(it.quantity),
+        `$${Number(it.cost).toLocaleString("es-AR")}`,
+        `$${(it.quantity * Number(it.cost)).toLocaleString("es-AR")}`
+      ]),
+      headStyles:{ fillColor:[176,141,87] },
+      styles:{ fontSize:10 }
+    });
+
+    const y = (doc as any).lastAutoTable.finalY + 12;
+    doc.setFontSize(14);
+    doc.setFont("helvetica","bold");
+    doc.text(
+      `TOTAL: $${Number(purchase.total).toLocaleString("es-AR")}`,
+      140, y
+    );
+    doc.setFont("helvetica","normal");
+
+    const fecha = new Date(purchase.createdAt)
+      .toLocaleDateString("es-AR")
+      .replace(/\//g,"-");
+
+    doc.save(`compra-${purchase.supplier?.name || "materia-prima"}-${fecha}.pdf`);
 
   }
 
@@ -217,12 +271,31 @@ export default function PurchasesTable({
 
                       <td>
                         <div className="flex gap-2">
+
+                          <button
+                            onClick={()=>onEdit(purchase)}
+                            className="px-3 py-1 border rounded-lg hover:bg-stone-100"
+                            title="Editar"
+                          >
+                            <Pencil size={15}/>
+                          </button>
+
+                          <button
+                            onClick={()=>printPurchase(purchase)}
+                            className="px-3 py-1 border rounded-lg hover:bg-stone-100"
+                            title="Imprimir PDF"
+                          >
+                            <Printer size={15}/>
+                          </button>
+
                           <button
                             onClick={()=>deletePurchase(purchase.id)}
                             className="px-3 py-1 bg-red-100 text-red-700 rounded-lg"
+                            title="Eliminar"
                           >
                             🗑️
                           </button>
+
                         </div>
                       </td>
 

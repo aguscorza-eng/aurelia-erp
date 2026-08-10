@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 interface Props {
   open:boolean;
   onClose:()=>void;
-  purchaseId:string|null;
+  purchase?:any;
 }
 
 
@@ -25,7 +25,8 @@ type Item = {
 
 export default function PurchaseModal({
   open,
-  onClose
+  onClose,
+  purchase
 }:Props){
 
 
@@ -41,9 +42,28 @@ export default function PurchaseModal({
 
 
   useEffect(()=>{
+
     if(!open) return;
+
     loadSuppliers();
-    reset();
+
+    // Si estamos editando, precargamos proveedor e insumos.
+    if(purchase){
+      setSupplier(purchase.supplier?.name || "");
+      setItems(
+        (purchase.items || []).map((it:any)=>({
+          name: it.name || it.product?.name || "",
+          quantity: it.quantity,
+          cost: Number(it.cost)
+        }))
+      );
+      setInsumo("");
+      setQuantity(1);
+      setCost(0);
+    }else{
+      reset();
+    }
+
   },[open]);
 
 
@@ -113,26 +133,36 @@ export default function PurchaseModal({
       return;
     }
 
+    const payload = {
+      supplierName:supplier,
+      purchaseType:"MATERIA_PRIMA",
+      items:items.map(item=>({
+        name:item.name,
+        quantity:item.quantity,
+        cost:item.cost
+      }))
+    };
+
     try{
 
-      const res = await fetch("/api/purchases",{
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body:JSON.stringify({
-          supplierName:supplier,
-          purchaseType:"MATERIA_PRIMA",
-          items:items.map(item=>({
-            name:item.name,
-            quantity:item.quantity,
-            cost:item.cost
-          }))
-        })
-      });
+      const res = purchase?.id
+
+        ? await fetch(`/api/purchases/${purchase.id}`,{
+            method:"PUT",
+            headers:{ "Content-Type":"application/json" },
+            body:JSON.stringify(payload)
+          })
+
+        : await fetch("/api/purchases",{
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body:JSON.stringify(payload)
+          });
 
       const data = await res.json();
 
       if(!res.ok){
-        alert(data.error || "Error creando compra");
+        alert(data.error || "Error guardando la compra");
         return;
       }
 
@@ -165,7 +195,7 @@ export default function PurchaseModal({
 
 
         <h2 className="text-2xl font-bold mb-6">
-          Nueva compra de materia prima
+          {purchase ? "Editar compra" : "Nueva compra de materia prima"}
         </h2>
 
 

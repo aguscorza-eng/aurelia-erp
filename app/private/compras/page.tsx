@@ -17,8 +17,7 @@ export default function ComprasPage() {
 
   const [openModal, setOpenModal] = useState(false);
 
-  const [selectedPurchaseId, setSelectedPurchaseId] =
-    useState<string | null>(null);
+  const [editingPurchase, setEditingPurchase] = useState<any>(null);
 
 
 
@@ -26,7 +25,7 @@ export default function ComprasPage() {
 
   function openNewPurchase() {
 
-    setSelectedPurchaseId(null);
+    setEditingPurchase(null);
 
     setOpenModal(true);
 
@@ -37,9 +36,9 @@ export default function ComprasPage() {
 
 
 
-  function editPurchase(id:string) {
+  function editPurchase(purchase:any) {
 
-    setSelectedPurchaseId(id);
+    setEditingPurchase(purchase);
 
     setOpenModal(true);
 
@@ -55,7 +54,7 @@ export default function ComprasPage() {
 
     setOpenModal(false);
 
-    setSelectedPurchaseId(null);
+    setEditingPurchase(null);
 
   }
 
@@ -119,7 +118,7 @@ export default function ComprasPage() {
 
             onClose={closeModal}
 
-            purchaseId={selectedPurchaseId}
+            purchase={editingPurchase}
 
           />
 
