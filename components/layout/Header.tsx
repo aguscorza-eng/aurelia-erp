@@ -1,8 +1,9 @@
 "use client";
 
-import { Bell, Search, Settings, LogOut } from "lucide-react";
+import { Bell, Search, Settings, LogOut, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import SaleModal from "@/components/sales/SaleModal";
 
 
 export default function Header() {
@@ -10,6 +11,8 @@ export default function Header() {
   const router = useRouter();
 
   const [user,setUser] = useState<any>(null);
+
+  const [openSale,setOpenSale] = useState(false);
 
 
 
@@ -40,6 +43,39 @@ export default function Header() {
 
 
 
+  // Registra una venta rápida desde cualquier sección (mismo modal
+  // que la sección Ventas). La venta va a la base y descuenta stock.
+  async function saveQuickSale(order:any){
+
+    try{
+
+      const res = await fetch("/api/sales",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify(order)
+      });
+
+      const data = await res.json();
+
+      if(!res.ok){
+        console.error(data.error);
+        alert("Error guardando la venta");
+        return;
+      }
+
+      alert("✅ Venta registrada correctamente.");
+
+    }catch(error){
+      console.error(error);
+      alert("Error de conexión");
+    }
+
+  }
+
+
+
   return (
     <header className="h-20 bg-white border-b border-stone-200 flex items-center justify-between px-10">
 
@@ -65,6 +101,16 @@ export default function Header() {
       {/* Derecha */}
 
       <div className="flex items-center gap-5">
+
+
+        {/* Venta rápida */}
+        <button
+          onClick={()=>setOpenSale(true)}
+          className="flex items-center gap-2 bg-[#B08D57] hover:bg-[#9a794a] text-white px-4 h-11 rounded-xl font-medium transition"
+        >
+          <Plus size={18}/>
+          Venta rápida
+        </button>
 
 
         <button className="text-stone-500 hover:text-black">
@@ -132,6 +178,14 @@ export default function Header() {
 
 
       </div>
+
+
+
+      <SaleModal
+        open={openSale}
+        onClose={()=>setOpenSale(false)}
+        onSave={saveQuickSale}
+      />
 
 
     </header>
