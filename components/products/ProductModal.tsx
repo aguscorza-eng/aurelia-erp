@@ -31,6 +31,8 @@ const [name,setName]=useState("");
 
 const [sku,setSku]=useState("");
 
+const [skuEdited,setSkuEdited]=useState(false);
+
 const [cost,setCost]=useState("");
 
 const [price,setPrice]=useState("");
@@ -102,6 +104,8 @@ setName(product.name || "");
 
 setSku(product.sku || "");
 
+setSkuEdited(true);
+
 setCost(String(product.cost || ""));
 
 setPrice(String(product.price || ""));
@@ -138,12 +142,27 @@ console.error(error);
 
 
 
+// Genera un SKU a partir del nombre: mayúsculas, sin acentos, con guiones.
+function generateSku(text:string){
+  return text
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g,"")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g,"-")
+    .replace(/^-+|-+$/g,"")
+    .slice(0,24);
+}
+
+
+
 function clearForm(){
 
 
 setName("");
 
 setSku("");
+
+setSkuEdited(false);
 
 setCost("");
 
@@ -387,7 +406,11 @@ return(
 
 value={name}
 
-onChange={(e)=>setName(e.target.value)}
+onChange={(e)=>{
+  const v = e.target.value;
+  setName(v);
+  if(!skuEdited) setSku(generateSku(v));
+}}
 
 placeholder="Nombre"
 
@@ -403,9 +426,9 @@ className="border rounded-xl h-12 px-4"
 
 value={sku}
 
-onChange={(e)=>setSku(e.target.value)}
+onChange={(e)=>{ setSku(e.target.value); setSkuEdited(true); }}
 
-placeholder="SKU"
+placeholder="SKU (automático)"
 
 className="border rounded-xl h-12 px-4"
 

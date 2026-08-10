@@ -134,6 +134,16 @@ categoryId = newCategory.id;
 
 
 
+// Aseguramos que el SKU sea único (si el auto-generado se repite, le sumamos sufijo).
+let sku = (body.sku || "").trim() || "SKU";
+let skuBase = sku;
+let skuN = 1;
+while(await prisma.product.findFirst({ where:{ sku } })){
+skuN++;
+sku = `${skuBase}-${skuN}`;
+}
+
+
 const product = await prisma.product.create({
 
 data:{
@@ -145,8 +155,7 @@ body.name,
 
 
 
-sku:
-body.sku,
+sku,
 
 
 
