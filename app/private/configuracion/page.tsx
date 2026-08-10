@@ -4,6 +4,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
 
 import CompanyForm from "@/components/settings/CompanyForm";
+import BackupCard from "@/components/settings/BackupCard";
 
 
 
@@ -95,6 +96,9 @@ Administración general de Aurelia
 
 
 <CompanyForm />
+
+
+<BackupCard />
 
 
 
