@@ -90,6 +90,8 @@ export default function Home(){
 
   const totalSales = dashboard.salesMonth || 0;
 
+  const salesChange = dashboard.salesChange;
+
   const totalGlobal = dashboard.totalGlobal || 0;
 
   const salesCount = dashboard.salesCount || 0;
@@ -199,6 +201,7 @@ export default function Home(){
                 title="Ventas del mes"
                 value={money(totalSales)}
                 icon={<TrendingUp size={19}/>}
+                change={salesChange}
               />
 
 
@@ -380,11 +383,13 @@ return (
 function Card({
  title,
  value,
- icon
+ icon,
+ change
 }:{
  title:string;
  value:any;
  icon:any;
+ change?:number | null;
 }){
 
 
@@ -403,6 +408,13 @@ return (
 <h2 className="text-2xl font-bold mt-2">
 {value}
 </h2>
+
+
+{typeof change === "number" && (
+<p className={`text-xs font-medium mt-1 ${change >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+{change >= 0 ? "+" : ""}{change}% vs mes anterior
+</p>
+)}
 
 
 </div>

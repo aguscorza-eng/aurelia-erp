@@ -20,6 +20,13 @@ export async function GET() {
     );
 
 
+    const startOfPrevMonth = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth() - 1,
+      1
+    );
+
+
     const sales = await prisma.sale.findMany({
 
       where: {
@@ -61,6 +68,33 @@ export async function GET() {
         total + Number(sale.total),
       0
     );
+
+
+
+    // Variación vs el mes anterior (% ). Sirve para saber cómo venimos.
+    const prevSales = await prisma.sale.findMany({
+      where: {
+        createdAt: {
+          gte: startOfPrevMonth,
+          lt: startOfMonth
+        }
+      },
+      select: { total: true }
+    });
+
+    const salesPrevMonth = prevSales.reduce(
+      (total, sale) => total + Number(sale.total),
+      0
+    );
+
+    let salesChange: number | null = null;
+    if (salesPrevMonth > 0) {
+      salesChange = Math.round(
+        ((salesMonth - salesPrevMonth) / salesPrevMonth) * 100
+      );
+    } else if (salesMonth > 0) {
+      salesChange = 100;
+    }
 
 
 
@@ -237,6 +271,8 @@ export async function GET() {
     return NextResponse.json({
 
       salesMonth,
+
+      salesChange,
 
       totalGlobal,
 
