@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Package,
-  Factory,
+  Truck,
   Users,
   ShoppingCart,
   ShoppingBag,
@@ -49,9 +49,9 @@ const menu = [
 
 
       {
-        icon: Factory,
-        label: "Producción",
-        href: "/private/produccion",
+        icon: Truck,
+        label: "Proveedores",
+        href: "/private/proveedores",
       },
 
 
