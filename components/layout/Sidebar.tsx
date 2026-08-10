@@ -15,6 +15,7 @@ import {
   BarChart3,
   Settings,
   FileText,
+  DollarSign,
 } from "lucide-react";
 
 
@@ -99,6 +100,13 @@ const menu = [
         icon: Wallet,
         label: "Caja",
         href: "/private/caja",
+      },
+
+
+      {
+        icon: DollarSign,
+        label: "Cuentas por cobrar",
+        href: "/private/cobranzas",
       },
 
 

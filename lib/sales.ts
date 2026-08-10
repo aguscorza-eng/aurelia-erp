@@ -20,6 +20,8 @@ export function serializeSale(sale: any) {
     client:
       sale.customer?.name || "Consumidor final",
 
+    clientPhone: sale.customer?.phone || "",
+
     products:
 
       (sale.items || []).map((item: any) => ({
