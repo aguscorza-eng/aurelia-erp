@@ -70,28 +70,16 @@ clearForm();
 
 
 
-function loadSupplier(){
+async function loadSupplier(){
 
 
-const suppliers = JSON.parse(
+try{
 
-localStorage.getItem("suppliers") || "[]"
+const res = await fetch(`/api/suppliers/${supplierId}`);
 
-);
+const supplier = await res.json();
 
-
-
-const supplier = suppliers.find(
-
-(s:any)=>s.id===supplierId
-
-);
-
-
-
-if(!supplier)return;
-
-
+if(!res.ok || !supplier) return;
 
 setName(supplier.name || "");
 
@@ -102,6 +90,10 @@ setPhone(supplier.phone || "");
 setEmail(supplier.email || "");
 
 setNotes(supplier.notes || "");
+
+}catch(error){
+console.error(error);
+}
 
 
 
@@ -138,7 +130,7 @@ setNotes("");
 
 
 
-function saveSupplier(){
+async function saveSupplier(){
 
 
 
@@ -151,94 +143,37 @@ return;
 }
 
 
+const payload = { name, company, phone, email, notes };
 
 
-const supplier={
+try{
 
+const res = supplierId
 
-id:
+? await fetch(`/api/suppliers/${supplierId}`,{
+method:"PUT",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify(payload)
+})
 
-supplierId ||
+: await fetch("/api/suppliers",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify(payload)
+});
 
-Date.now().toString(),
-
-
-name,
-
-company,
-
-phone,
-
-email,
-
-notes
-
-
-};
-
-
-
-
-
-const old = JSON.parse(
-
-localStorage.getItem("suppliers") || "[]"
-
-);
-
-
-
-
-
-let updated;
-
-
-
-if(supplierId){
-
-
-updated = old.map((s:any)=>
-
-s.id===supplierId
-
-?s
-
-: supplier
-
-);
-
-
-}else{
-
-
-updated=[
-
-...old,
-
-supplier
-
-];
-
-
+if(!res.ok){
+alert("Error al guardar el proveedor");
+return;
 }
 
-
-
-
-localStorage.setItem(
-
-"suppliers",
-
-JSON.stringify(updated)
-
-);
-
-
-
-
 onClose();
-
 window.location.reload();
+
+}catch(error){
+console.error(error);
+alert("Error de conexión");
+}
 
 
 

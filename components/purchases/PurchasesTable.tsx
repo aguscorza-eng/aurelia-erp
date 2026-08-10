@@ -7,7 +7,7 @@ type Purchase = {
 
   id:string;
 
-  supplier:string;
+  supplier:any;
 
   total:number;
 
@@ -15,11 +15,7 @@ type Purchase = {
 
   createdAt:string;
 
-  items:{
-    product:string;
-    quantity:number;
-    cost:number;
-  }[];
+  items:any[];
 
 };
 
@@ -61,17 +57,22 @@ useEffect(()=>{
 
 
 
-function loadPurchases(){
+async function loadPurchases(){
 
 
- const data = JSON.parse(
+ try{
 
-  localStorage.getItem("purchases") || "[]"
+  const res = await fetch("/api/purchases");
 
- );
+  const data = await res.json();
 
+  setPurchases(data.data || []);
 
- setPurchases(data);
+ }catch(error){
+
+  console.error(error);
+
+ }
 
 
  setLoading(false);
@@ -84,7 +85,7 @@ function loadPurchases(){
 
 
 
-function deletePurchase(id:string){
+async function deletePurchase(id:string){
 
 
  const ok = confirm(
@@ -97,26 +98,23 @@ function deletePurchase(id:string){
  if(!ok)return;
 
 
+ try{
 
- const updated = purchases.filter(
+  const res = await fetch(`/api/purchases/${id}`,{
+   method:"DELETE"
+  });
 
-  (purchase)=>purchase.id !== id
+  if(!res.ok){
+   alert("Error al eliminar la compra");
+   return;
+  }
 
- );
+  setPurchases((prev)=>prev.filter((p)=>p.id !== id));
 
-
-
- localStorage.setItem(
-
-  "purchases",
-
-  JSON.stringify(updated)
-
- );
-
-
-
- setPurchases(updated);
+ }catch(error){
+  console.error(error);
+  alert("Error de conexión");
+ }
 
 
 }
@@ -236,7 +234,7 @@ purchase.createdAt
 
 <td className="font-semibold">
 
-{purchase.supplier}
+{purchase.supplier?.name || "-"}
 
 </td>
 
@@ -257,7 +255,7 @@ purchase.createdAt
 <td className="font-semibold">
 
 $
-{purchase.total.toLocaleString("es-AR")}
+{Number(purchase.total).toLocaleString("es-AR")}
 
 </td>
 
@@ -285,22 +283,6 @@ $
 <div className="flex gap-2">
 
 
-
-<button
-
-onClick={()=>onEdit(purchase.id)}
-
-className="px-3 py-1 border rounded-lg"
-
->
-
-✏️
-
-</button>
-
-
-
-
 <button
 
 onClick={()=>deletePurchase(purchase.id)}
@@ -312,8 +294,6 @@ className="px-3 py-1 bg-red-100 text-red-700 rounded-lg"
 🗑️
 
 </button>
-
-
 
 
 </div>

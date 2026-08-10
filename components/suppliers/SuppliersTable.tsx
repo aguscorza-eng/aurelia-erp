@@ -66,18 +66,22 @@ loadSuppliers();
 
 
 
-function loadSuppliers(){
+async function loadSuppliers(){
 
 
-const data = JSON.parse(
+try{
 
-localStorage.getItem("suppliers") || "[]"
+const res = await fetch("/api/suppliers");
 
-);
+const data = await res.json();
 
+setSuppliers(data.data || []);
 
+}catch(error){
 
-setSuppliers(data);
+console.error(error);
+
+}
 
 setLoading(false);
 
@@ -92,7 +96,7 @@ setLoading(false);
 
 
 
-function deleteSupplier(id:string){
+async function deleteSupplier(id:string){
 
 
 
@@ -108,32 +112,23 @@ if(!ok)return;
 
 
 
+try{
 
+const res = await fetch(`/api/suppliers/${id}`,{
+method:"DELETE"
+});
 
-const updated = suppliers.filter(
+if(!res.ok){
+alert("Error al eliminar el proveedor");
+return;
+}
 
-(supplier)=>
+setSuppliers((prev)=>prev.filter((s)=>s.id !== id));
 
-supplier.id !== id
-
-);
-
-
-
-
-
-localStorage.setItem(
-
-"suppliers",
-
-JSON.stringify(updated)
-
-);
-
-
-
-
-setSuppliers(updated);
+}catch(error){
+console.error(error);
+alert("Error de conexión");
+}
 
 
 
