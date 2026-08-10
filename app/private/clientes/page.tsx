@@ -28,148 +28,61 @@ const [clientEdit,setClientEdit] = useState<any>(null);
 
 
 
-function loadClients(){
+async function loadClients(){
 
 
-const salesData = JSON.parse(
-localStorage.getItem("sales") || "[]"
-);
+try{
+
+const [custRes,salesRes] = await Promise.all([
+fetch("/api/customers"),
+fetch("/api/sales")
+]);
+
+const custData = await custRes.json();
+const salesData = await salesRes.json();
+
+const customers = custData.data || [];
+const salesList = salesData.data || [];
+
+setSales(salesList);
 
 
+// Calculamos las estadísticas por cliente (nombre) desde las ventas.
+const stats:any = {};
 
-const manualClients = JSON.parse(
-localStorage.getItem("clients") || "[]"
-);
-
-
-
-setSales(salesData);
-
-
-
-const grouped:any = {};
-
-
-
-
-salesData.forEach((sale:any)=>{
-
+salesList.forEach((sale:any)=>{
 
 const name = sale.client || "Sin cliente";
 
-
-
-if(!grouped[name]){
-
-
-grouped[name]={
-
-name,
-
-phone:"",
-
-email:"",
-
-orders:0,
-
-total:0,
-
-lastDate:null
-
-};
-
-
+if(!stats[name]){
+stats[name] = { orders:0, total:0, lastDate:null };
 }
 
+stats[name].orders += 1;
+stats[name].total += Number(sale.total) || 0;
 
-
-grouped[name].orders += 1;
-
-grouped[name].total += sale.total || 0;
-
-
-
-if(sale.createdAt){
-
-grouped[name].lastDate = sale.createdAt;
-
+// Las ventas vienen ordenadas desc, la primera es la más reciente.
+if(sale.createdAt && !stats[name].lastDate){
+stats[name].lastDate = sale.createdAt;
 }
-
 
 });
 
 
+const array = customers.map((c:any)=>({
+...c,
+orders: stats[c.name]?.orders || 0,
+total: stats[c.name]?.total || 0,
+lastDate: stats[c.name]?.lastDate || null
+}));
 
-
-
-
-manualClients.forEach((client:any)=>{
-
-
-grouped[client.name]={
-
-...grouped[client.name],
-
-
-id:client.id,
-
-
-name:client.name,
-
-
-firstName:client.firstName || "",
-
-
-lastName:client.lastName || "",
-
-
-company:client.company || "",
-
-
-phone:client.phone || "",
-
-
-email:client.email || "",
-
-
-notes:client.notes || "",
-
-
-orders:grouped[client.name]?.orders || 0,
-
-
-total:grouped[client.name]?.total || 0,
-
-
-lastDate:grouped[client.name]?.lastDate || null
-
-
-};
-
-
-});
-
-
-
-
-
-
-
-const array:any[] = Object.values(grouped);
-
-
-
-array.sort(
-
-(a:any,b:any)=>
-
-b.total-a.total
-
-);
-
-
+array.sort((a:any,b:any)=>b.total-a.total);
 
 setClients(array);
+
+}catch(error){
+console.error(error);
+}
 
 
 }
@@ -181,7 +94,57 @@ setClients(array);
 
 useEffect(()=>{
 
+// Migración única: si había clientes guardados en el navegador
+// (versión vieja), los subimos a la base y limpiamos el localStorage.
+async function migrateAndLoad(){
+
+const raw = localStorage.getItem("clients");
+
+
+if(raw){
+
+let local:any[] = [];
+
+try{ local = JSON.parse(raw) || []; }catch{ local = []; }
+
+
+if(local.length > 0){
+
+try{
+
+const res = await fetch("/api/customers");
+const data = await res.json();
+
+const existingNames = new Set(
+(data.data || []).map((c:any)=>c.name)
+);
+
+for(const c of local){
+if(c.name && !existingNames.has(c.name)){
+await fetch("/api/customers",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify(c)
+});
+}
+}
+
+}catch(error){
+console.error(error);
+}
+
+}
+
+localStorage.removeItem("clients");
+
+}
+
+
 loadClients();
+
+}
+
+migrateAndLoad();
 
 },[]);
 
@@ -210,104 +173,31 @@ client.name
 
 
 
-function saveClient(client:any){
+async function saveClient(client:any){
 
 
-const oldClients = JSON.parse(
+try{
 
-localStorage.getItem("clients") || "[]"
-
-);
-
-
-
-localStorage.setItem(
-
-"clients",
-
-JSON.stringify([
-
-...oldClients,
-
-client
-
-])
-
-);
-
-
-
-setOpenCustomer(false);
-
-loadClients();
-
-
-}
-
-
-
-
-
-
-
-
-
-function updateClient(client:any){
-
-
-const oldClients = JSON.parse(
-
-localStorage.getItem("clients") || "[]"
-
-);
-
-
-
-const updated = oldClients.map((item:any)=>{
-
-
-if(
-
-item.id === client.id
-
-){
-
-
-return {
-
-...item,
-
-...client
-
-};
-
-
-}
-
-
-
-return item;
-
-
+const res = await fetch("/api/customers",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify(client)
 });
 
-
-
-localStorage.setItem(
-
-"clients",
-
-JSON.stringify(updated)
-
-);
-
-
-
-setClientEdit(null);
+if(!res.ok){
+const data = await res.json();
+console.error(data.error);
+alert("Error al guardar el cliente");
+return;
+}
 
 setOpenCustomer(false);
-
 loadClients();
+
+}catch(error){
+console.error(error);
+alert("Error de conexión");
+}
 
 
 }
@@ -320,7 +210,45 @@ loadClients();
 
 
 
-function deleteClient(client:any){
+async function updateClient(client:any){
+
+
+try{
+
+const res = await fetch(`/api/customers/${client.id}`,{
+method:"PATCH",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify(client)
+});
+
+if(!res.ok){
+const data = await res.json();
+console.error(data.error);
+alert("Error al actualizar el cliente");
+return;
+}
+
+setClientEdit(null);
+setOpenCustomer(false);
+loadClients();
+
+}catch(error){
+console.error(error);
+alert("Error de conexión");
+}
+
+
+}
+
+
+
+
+
+
+
+
+
+async function deleteClient(client:any){
 
 
 const confirmar = window.confirm(
@@ -335,34 +263,25 @@ if(!confirmar)return;
 
 
 
+try{
 
-const clientsData = JSON.parse(
+const res = await fetch(`/api/customers/${client.id}`,{
+method:"DELETE"
+});
 
-localStorage.getItem("clients") || "[]"
-
-);
-
-
-
-localStorage.setItem(
-
-"clients",
-
-JSON.stringify(
-
-clientsData.filter(
-
-(item:any)=>item.id !== client.id
-
-)
-
-)
-
-);
-
-
+if(!res.ok){
+const data = await res.json();
+console.error(data.error);
+alert("Error al eliminar el cliente");
+return;
+}
 
 loadClients();
+
+}catch(error){
+console.error(error);
+alert("Error de conexión");
+}
 
 
 }
@@ -856,6 +775,8 @@ rounded-xl
 client={selectedClient}
 
 sales={sales}
+
+clients={clients}
 
 onClose={()=>setSelectedClient(null)}
 

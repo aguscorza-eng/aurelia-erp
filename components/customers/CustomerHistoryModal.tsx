@@ -17,6 +17,8 @@ interface Props {
 
   sales:any[];
 
+  clients?:any[];
+
   onClose:()=>void;
 
 }
@@ -28,6 +30,8 @@ export default function CustomerHistoryModal({
   client,
 
   sales,
+
+  clients: clientsList,
 
   onClose
 
@@ -53,15 +57,7 @@ export default function CustomerHistoryModal({
 
 
 
-  const clients = JSON.parse(
-
-    localStorage.getItem("clients") || "[]"
-
-  );
-
-
-
-  const clientData = clients.find(
+  const clientData = (clientsList || []).find(
 
     (c:any)=>
 

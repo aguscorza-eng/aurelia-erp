@@ -143,11 +143,21 @@ async function loadData(){
 
 
 
-const clientsData = JSON.parse(
+let clientsData:any[] = [];
 
-localStorage.getItem("clients") || "[]"
+try{
 
-);
+const custRes = await fetch("/api/customers");
+
+const custData = await custRes.json();
+
+if(custRes.ok){
+clientsData = custData.data || [];
+}
+
+}catch(error){
+console.error(error);
+}
 
 
 
@@ -249,7 +259,7 @@ setProducts(terminados);
 
 
 
-function createQuickClient(){
+async function createQuickClient(){
 
 
 const name = newClientName.trim();
@@ -264,43 +274,32 @@ return;
 }
 
 
-const client:any = {
+try{
 
-id:Date.now(),
-
-firstName:name,
-
-lastName:"",
-
-company:"",
-
+const res = await fetch("/api/customers",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({
 name,
-
+firstName:name,
 phone:newClientPhone.trim(),
+email:newClientEmail.trim()
+})
+});
 
-email:newClientEmail.trim(),
+const data = await res.json();
 
-notes:"",
+if(!res.ok){
+console.error(data.error);
+alert("Error al crear el cliente");
+return;
+}
 
-createdAt:new Date().toISOString()
-
-};
-
-
-const stored = JSON.parse(
-localStorage.getItem("clients") || "[]"
-);
-
-const updated = [...stored, client];
-
-localStorage.setItem(
-"clients",
-JSON.stringify(updated)
-);
+const client = data.data;
 
 
 // Actualizamos la lista y seleccionamos el cliente recién creado.
-setClients(updated);
+setClients((prev)=>[client, ...prev]);
 setSelectedClient(client);
 
 
@@ -308,6 +307,11 @@ setNewClientName("");
 setNewClientPhone("");
 setNewClientEmail("");
 setShowNewClient(false);
+
+}catch(error){
+console.error(error);
+alert("Error de conexión");
+}
 
 
 }

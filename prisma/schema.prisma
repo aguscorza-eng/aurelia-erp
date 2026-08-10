@@ -109,11 +109,14 @@ model Recipe {
 }
 
 model Customer {
-  id    String  @id @default(cuid())
-  name  String
-  phone String?
-  email String?
-  notes String?
+  id        String  @id @default(cuid())
+  name      String
+  firstName String?
+  lastName  String?
+  company   String?
+  phone     String?
+  email     String?
+  notes     String?
 
   sales Sale[]
 

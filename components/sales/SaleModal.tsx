@@ -86,16 +86,27 @@ const [selectedProduct,setSelectedProduct] = useState<any>(null);
 
   useEffect(()=>{
 
+    if(!open) return;
 
-    const data = localStorage.getItem("clients");
+    async function loadClients(){
 
+      try{
 
-    if(data){
+        const res = await fetch("/api/customers");
 
-      setClients(JSON.parse(data));
+        const data = await res.json();
+
+        if(res.ok){
+          setClients(data.data || []);
+        }
+
+      }catch(error){
+        console.error(error);
+      }
 
     }
 
+    loadClients();
 
   },[open]);
 
@@ -207,7 +218,7 @@ useEffect(()=>{
 
 
 
-  function createQuickClient(){
+  async function createQuickClient(){
 
 
     const name = newClientName.trim();
@@ -222,53 +233,48 @@ useEffect(()=>{
     }
 
 
-    const client = {
+    try{
 
-      id:Date.now(),
+      const res = await fetch("/api/customers",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify({
+          name,
+          firstName:name,
+          phone:newClientPhone.trim(),
+          email:newClientEmail.trim()
+        })
+      });
 
-      firstName:name,
+      const data = await res.json();
 
-      lastName:"",
+      if(!res.ok){
+        console.error(data.error);
+        alert("Error al crear el cliente");
+        return;
+      }
 
-      company:"",
-
-      name,
-
-      phone:newClientPhone.trim(),
-
-      email:newClientEmail.trim(),
-
-      notes:"",
-
-      createdAt:new Date().toISOString()
-
-    };
-
-
-    const stored = JSON.parse(
-      localStorage.getItem("clients") || "[]"
-    );
-
-    const updated = [...stored, client];
-
-    localStorage.setItem(
-      "clients",
-      JSON.stringify(updated)
-    );
+      const client = data.data;
 
 
-    // Actualizamos la lista y seleccionamos el cliente recién creado.
-    setClients(updated);
-    setSelectedClient(client);
-    setClient(name);
-    setSearchClient("");
-    setShowClients(false);
+      // Lo agregamos a la lista y lo seleccionamos para la venta.
+      setClients((prev)=>[client, ...prev]);
+      setSelectedClient(client);
+      setClient(client.name);
+      setSearchClient("");
+      setShowClients(false);
 
 
-    setNewClientName("");
-    setNewClientPhone("");
-    setNewClientEmail("");
-    setShowNewClient(false);
+      setNewClientName("");
+      setNewClientPhone("");
+      setNewClientEmail("");
+      setShowNewClient(false);
+
+
+    }catch(error){
+      console.error(error);
+      alert("Error de conexión");
+    }
 
 
   }
