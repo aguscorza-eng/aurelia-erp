@@ -30,6 +30,7 @@ export default function CalculadoraPage(){
 
   const [multMay,setMultMay] = useState(3);
   const [multMin,setMultMin] = useState(4);
+  const [rinde,setRinde] = useState(1);
 
 
   const [recipes,setRecipes] = useState<any[]>([]);
@@ -59,9 +60,11 @@ export default function CalculadoraPage(){
   const totalOtros = otros.reduce((a,o)=>a + (Number(o.price) || 0), 0);
   const costoTotal = totalInsumos + totalOtros;
 
+  const costoUnidad = costoTotal / (Number(rinde) || 1);
+
   const round100 = (n:number)=> Math.round(n / 100) * 100;
-  const precioMay = round100(costoTotal * (Number(multMay) || 0));
-  const precioMin = round100(costoTotal * (Number(multMin) || 0));
+  const precioMay = round100(costoUnidad * (Number(multMay) || 0));
+  const precioMin = round100(costoUnidad * (Number(multMin) || 0));
 
 
   function updateInsumo(index:number, field:keyof Insumo, value:any){
@@ -84,6 +87,7 @@ export default function CalculadoraPage(){
     setOtros([]);
     setMultMay(3);
     setMultMin(4);
+    setRinde(1);
   }
 
   function cargarReceta(id:string){
@@ -97,6 +101,7 @@ export default function CalculadoraPage(){
     setOtros(d.otros || []);
     setMultMay(d.multMay ?? 3);
     setMultMin(d.multMin ?? 4);
+    setRinde(d.rinde ?? 1);
   }
 
   async function guardarReceta(){
@@ -107,7 +112,7 @@ export default function CalculadoraPage(){
 
     const payload = {
       name: recipeName.trim(),
-      data: { insumos, otros, multMay, multMin }
+      data: { insumos, otros, multMay, multMin, rinde }
     };
 
     try{
@@ -341,6 +346,16 @@ export default function CalculadoraPage(){
             <div className="bg-white border rounded-2xl p-4">
               <div className="flex flex-wrap items-center gap-4">
                 <div>
+                  <label className="text-xs text-stone-500 block mb-1">Rinde (unidades)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={rinde}
+                    onChange={(e)=>setRinde(Number(e.target.value))}
+                    className={`${inputCls} w-24`}
+                  />
+                </div>
+                <div>
                   <label className="text-xs text-stone-500 block mb-1">Mayorista (× costo)</label>
                   <input
                     type="number"
@@ -369,9 +384,14 @@ export default function CalculadoraPage(){
 
               <div className="bg-white border rounded-2xl p-4">
                 <div className="flex items-center gap-1.5 text-stone-500 text-xs">
-                  <Calculator size={14}/> Costo total
+                  <Calculator size={14}/> Costo x unidad
                 </div>
-                <h2 className="text-2xl font-bold mt-1">{money(costoTotal)}</h2>
+                <h2 className="text-2xl font-bold mt-1">{money(costoUnidad)}</h2>
+                {Number(rinde) > 1 && (
+                  <p className="text-[11px] text-stone-400 mt-1">
+                    Lote: {money(costoTotal)} ({rinde} u.)
+                  </p>
+                )}
               </div>
 
               <div className="bg-[#F8F2E9] border rounded-2xl p-4">
