@@ -39,6 +39,8 @@ export default function EditSaleModal({
 
   const [status,setStatus] = useState("PENDIENTE");
 
+  const [date,setDate] = useState("");
+
 
 
 
@@ -55,6 +57,9 @@ export default function EditSaleModal({
       setAdvance(sale.advance);
 
       setStatus(sale.status);
+
+      const d = sale.createdAt ? new Date(sale.createdAt) : new Date();
+      setDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`);
 
     }
 
@@ -74,6 +79,11 @@ export default function EditSaleModal({
   function save(){
 
 
+    const [y,m,d] = date.split("-").map(Number);
+    const dateISO = (y && m && d)
+      ? new Date(y, m-1, d, 12, 0, 0).toISOString()
+      : sale.createdAt;
+
     const updated = {
 
 
@@ -87,7 +97,9 @@ export default function EditSaleModal({
 
       balance: total - advance,
 
-      status
+      status,
+
+      date: dateISO
 
 
     };
@@ -118,7 +130,7 @@ export default function EditSaleModal({
 
         <h2 className="text-2xl font-bold">
 
-          Editar pedido #{sale.id.toString().slice(-5)}
+          Editar pedido {sale.number || `#${sale.id.toString().slice(-5)}`}
 
         </h2>
 
@@ -151,6 +163,34 @@ export default function EditSaleModal({
 
 
 
+
+
+
+
+        <div>
+
+
+          <label className="text-sm">
+
+            Fecha
+
+          </label>
+
+
+          <input
+
+            type="date"
+
+            className="w-full border rounded-xl p-3"
+
+            value={date}
+
+            onChange={(e)=>setDate(e.target.value)}
+
+          />
+
+
+        </div>
 
 
 

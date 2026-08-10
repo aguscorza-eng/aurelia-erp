@@ -24,6 +24,13 @@ export async function PATCH(
     if (body.advance !== undefined) data.advance = Number(body.advance) || 0;
     if (body.balance !== undefined) data.balance = Number(body.balance) || 0;
     if (body.payment !== undefined) data.paymentType = body.payment;
+    if (body.date !== undefined && body.date) {
+      const d = new Date(body.date);
+      if (!isNaN(d.getTime())) {
+        data.createdAt = d;
+        data.dateIn = d;
+      }
+    }
 
 
     const sale = await prisma.sale.update({

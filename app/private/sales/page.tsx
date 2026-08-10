@@ -253,7 +253,9 @@ export default function SalesPage(){
 
           balance:updated.balance,
 
-          payment:updated.payment
+          payment:updated.payment,
+
+          date:updated.date
 
         })
 

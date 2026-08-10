@@ -71,7 +71,7 @@ export default function Header() {
         return;
       }
 
-      alert("✅ Venta registrada correctamente.");
+      // Éxito: el modal se cierra solo, sin pop-up.
 
     }catch(error){
       console.error(error);
