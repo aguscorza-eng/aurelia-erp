@@ -162,6 +162,27 @@ export default function CalculadoraPage(){
   }
 
 
+  // Calcula costo y precios de una receta guardada (para la lista).
+  function calcRecipe(data:any){
+    const ins = (data?.insumos || []).reduce(
+      (a:number,i:any)=>a + (Number(i.grams)||0)/1000*(Number(i.pricePerKg)||0), 0
+    );
+    const otr = (data?.otros || []).reduce(
+      (a:number,o:any)=>a + (Number(o.price)||0), 0
+    );
+    const total = ins + otr;
+    const r = Number(data?.rinde) || 1;
+    const unidad = total / r;
+    const r100 = (n:number)=>Math.round(n/100)*100;
+    return {
+      costoUnidad: unidad,
+      precioMay: r100(unidad * (Number(data?.multMay)||0)),
+      precioMin: r100(unidad * (Number(data?.multMin)||0)),
+      insumosCount: (data?.insumos||[]).length
+    };
+  }
+
+
   const inputCls = "border rounded-xl px-3 py-2 text-sm";
 
 
@@ -417,6 +438,53 @@ export default function CalculadoraPage(){
 
 
           </div>
+
+
+          {/* RECETAS GUARDADAS (lista) */}
+          {recipes.length > 0 && (
+            <div>
+              <h2 className="text-lg font-bold mb-3 mt-2">Recetas guardadas</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {recipes.map((r)=>{
+                  const c = calcRecipe(r.data);
+                  return (
+                    <div
+                      key={r.id}
+                      className={`bg-white border rounded-2xl p-5 ${currentId===r.id ? "border-[#B08D57] ring-1 ring-[#B08D57]" : ""}`}
+                    >
+                      <div className="flex justify-between items-start gap-2">
+                        <div>
+                          <h3 className="font-bold leading-tight">{r.name}</h3>
+                          <p className="text-xs text-stone-400 mt-0.5">{c.insumosCount} insumos</p>
+                        </div>
+                        <button
+                          onClick={()=>cargarReceta(r.id)}
+                          className="text-xs bg-stone-900 text-white px-3 py-1.5 rounded-lg shrink-0"
+                        >
+                          Abrir
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2 mt-4 text-center">
+                        <div>
+                          <p className="text-[11px] text-stone-500">Costo/u</p>
+                          <p className="font-bold text-sm">{money(c.costoUnidad)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-stone-500">Mayor.</p>
+                          <p className="font-bold text-sm text-[#B08D57]">{money(c.precioMay)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-stone-500">Minor.</p>
+                          <p className="font-bold text-sm">{money(c.precioMin)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
 
         </div>
