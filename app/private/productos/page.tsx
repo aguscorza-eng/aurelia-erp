@@ -62,7 +62,7 @@ export default function ProductosPage() {
 
 
 
-      <section className="flex-1 flex flex-col overflow-hidden">
+      <section className="flex-1 flex flex-col overflow-hidden bg-[#F8F8F6]">
 
 
 
