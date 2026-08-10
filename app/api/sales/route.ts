@@ -142,9 +142,20 @@ export async function POST(
     const sale = await prisma.$transaction(async (tx) => {
 
 
+      // Número de pedido correlativo (PED001, PED002, ...)
+      const last = await tx.sale.findFirst({
+        orderBy: { orderNumber: "desc" },
+        select: { orderNumber: true }
+      });
+      const nextNumber = (last?.orderNumber || 0) + 1;
+
+
       const created = await tx.sale.create({
 
         data:{
+
+
+          orderNumber: nextNumber,
 
 
           customerId,

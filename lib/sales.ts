@@ -13,6 +13,10 @@ export function serializeSale(sale: any) {
 
     balance: Number(sale.balance),
 
+    number: sale.orderNumber
+      ? `PED${String(sale.orderNumber).padStart(3, "0")}`
+      : null,
+
     client:
       sale.customer?.name || "Consumidor final",
 
